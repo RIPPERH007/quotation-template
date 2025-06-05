@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบเสนอราคา - Quotation Template</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Sarabun', Arial, sans-serif;
+            line-height: 1.4;
+            color: #333;
+            background: #f8f9fa;
+            padding: 20px;
+        }
+        
+        .quotation-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #3498db);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            font-weight: 300;
+            letter-spacing: 2px;
+        }
+        
+        .thank-you {
+            font-size: 14px;
+            opacity: 0.9;
+            font-style: italic;
+        }
+        
+        .content {
+            padding: 30px;
+        }
+        
+        .company-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+        
+        .company-section {
+            flex: 1;
+        }
+        
+        .company-section h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 5px;
+        }
+        
+        .editable {
+            background: #f8f9fa;
+            border: 1px dashed #ddd;
+            padding: 8px;
+            margin: 5px 0;
+            border-radius: 4px;
+            min-height: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .editable:hover {
+            background: #e9ecef;
+            border-color: #3498db;
+        }
+        
+        .editable:focus {
+            outline: none;
+            background: white;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .quote-details {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .quote-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .info-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .info-label {
+            font-weight: bold;
+            margin-right: 10px;
+            color: #2c3e50;
+            min-width: 100px;
+        }
+        
+        .items-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .items-table th {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .items-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .items-table tr:nth-child(even) {
+            background: #f8f9fa;
+        }
+        
+        .items-table tr:hover {
+            background: #e9ecef;
+        }
+        
+        .description-cell {
+            text-align: left !important;
+            max-width: 300px;
+        }
+        
+        .total-section {
+            background: #2c3e50;
+            color: white;
+            padding: 15px;
+            text-align: right;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .payment-terms {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+        
+        .payment-terms h3 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+        
+        .signature-section {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+        }
+        
+        .signature-box {
+            text-align: center;
+            width: 250px;
+        }
+        
+        .signature-line {
+            border-top: 1px solid #333;
+            margin: 40px 0 10px 0;
+        }
+        
+        .add-item-btn {
+            background: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 0;
+            transition: background 0.3s ease;
+        }
+        
+        .add-item-btn:hover {
+            background: #2980b9;
+        }
+        
+        .remove-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+        
+        .remove-btn:hover {
+            background: #c0392b;
+        }
+        
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            
+            .quotation-container {
+                box-shadow: none;
+                border-radius: 0;
+            }
+            
+            .add-item-btn, .remove-btn {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .company-info {
+                flex-direction: column;
+            }
+            
+            .quote-info {
+                grid-template-columns: 1fr;
+            }
+            
+            .items-table {
+                font-size: 12px;
+            }
+            
+            .items-table th,
+            .items-table td {
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quotation-container">
+        <div class="header">
+            <h1>QUOTATION</h1>
+            <div class="thank-you">ขอขอบคุณที่ใช้บริการของเรา / Thank you for your business</div>
+        </div>
+        
+        <div class="content">
+            <div class="company-info">
+                <div class="company-section">
+                    <h3>ข้อมูลผู้เสนอราคา / Vendor Information</h3>
+                    <div><strong>ชื่อ/Name:</strong> <div class="editable" contenteditable="true">นายภควัฒน์ ขาวนิล</div></div>
+                    <div><strong>ที่อยู่/Address:</strong> 
+                        <div class="editable" contenteditable="true">45/200 The Connect Rm.8<br>เขตบางเขน ตำบลท่าแร้ง<br>กรุงเทพมหานคร 10220</div>
+                    </div>
+                    <div><strong>โทร/Tel:</strong> <div class="editable" contenteditable="true">(+66) 065-010-0040</div></div>
+                </div>
+                
+                <div class="company-section">
+                    <h3>ข้อมูลลูกค้า / Customer Information</h3>
+                    <div><strong>ชื่อบริษัท/Company:</strong> <div class="editable" contenteditable="true">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div></div>
+                    <div><strong>ที่อยู่/Address:</strong> 
+                        <div class="editable" contenteditable="true">225/708 หมู่ที่ 11 ตำบลบ้านแหวน<br>อำเภอหางดง จังหวัดเชียงใหม่ 50230</div>
+                    </div>
+                    <div><strong>เลขประจำตัวผู้เสียภาษี/Tax ID:</strong> <div class="editable" contenteditable="true">0505565016016</div></div>
+                </div>
+            </div>
+            
+            <div class="quote-details">
+                <div class="quote-info">
+                    <div class="info-item">
+                        <span class="info-label">เลขที่/No.:</span>
+                        <div class="editable" contenteditable="true">QT-20250604-001</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">วันที่/Date:</span>
+                        <div class="editable" contenteditable="true">04/06/2025</div>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">มีผลถึง/Valid Until:</span>
+                        <div class="editable" contenteditable="true">18/06/2025</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <h3 style="color: #2c3e50; margin-bottom: 15px;">รายละเอียดโครงการ / Project Details</h3>
+                <div><strong>ชื่อโครงการ/Project:</strong> <div class="editable" contenteditable="true">LockBox App</div></div>
+                <div><strong>ระยะเวลาดำเนินการ/Timeline:</strong> <div class="editable" contenteditable="true">2 วัน</div></div>
+            </div>
+            
+            <table class="items-table" id="itemsTable">
+                <thead>
+                    <tr>
+                        <th style="width: 50px;">ลำดับ<br>No.</th>
+                        <th>รายละเอียด<br>Description</th>
+                        <th style="width: 80px;">จำนวน<br>Qty</th>
+                        <th style="width: 120px;">ราคาต่อหน่วย<br>Unit Price</th>
+                        <th style="width: 120px;">จำนวนเงิน<br>Amount</th>
+                        <th style="width: 80px;">Action</th>
+                    </tr>
+                </thead>
+                <tbody id="itemsBody">
+                    <tr>
+                        <td>1</td>
+                        <td class="description-cell">
+                            <div class="editable" contenteditable="true">LockBox App (Flutter) (2 Day)<br>- แก้ Issue Term & Condition<br>- Build Android to PlayStore<br>- Build iOS to App Store</div>
+                        </td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">2,134.00</div></td>
+                        <td class="amount-cell">2,134.00</td>
+                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                    </tr>
+                    <tr>
+                        <td>2</td>
+                        <td class="description-cell">
+                            <div class="editable" contenteditable="true">หัก ณ ที่จ่าย 3%</div>
+                        </td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">66.00</div></td>
+                        <td class="amount-cell">66.00</td>
+                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <button class="add-item-btn" onclick="addRow()">+ เพิ่มรายการ / Add Item</button>
+            
+            <div class="total-section">
+                รวมเป็นเงิน / Total Amount: <span id="totalAmount">2,200.00</span> บาท
+            </div>
+            
+            <div class="payment-terms">
+                <h3>เงื่อนไขการชำระเงิน / Payment Terms</h3>
+                <div class="editable" contenteditable="true">
+                    เงื่อนไขการชำระเงินสำหรับระบบ LockBox App แบ่งเป็น 1 ช่วงเวลา คือ<br>
+                    1) หลังจาก Deploy to Store 100% (2,134 บาท)
+                </div>
+            </div>
+            
+            <div class="signature-section">
+                <div class="signature-box">
+                    <div>ผู้เสนอราคา / Vendor</div>
+                    <div class="signature-line"></div>
+                    <div>วันที่ / Date: ..........................</div>
+                </div>
+                
+                <div class="signature-box">
+                    <div>ผู้รับเสนอราคา / Customer</div>
+                    <div class="signature-line"></div>
+                    <div>วันที่ / Date: ..........................</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let itemCounter = 2;
+
+        function addRow() {
+            itemCounter++;
+            const tbody = document.getElementById('itemsBody');
+            const newRow = tbody.insertRow();
+            
+            newRow.innerHTML = `
+                <td>${itemCounter}</td>
+                <td class="description-cell">
+                    <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+                </td>
+                <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
+                <td class="amount-cell">0.00</td>
+                <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+            `;
+            
+            updateRowNumbers();
+            calculateTotal();
+        }
+
+        function removeRow(button) {
+            const row = button.closest('tr');
+            row.remove();
+            updateRowNumbers();
+            calculateTotal();
+        }
+
+        function updateRowNumbers() {
+            const rows = document.querySelectorAll('#itemsBody tr');
+            rows.forEach((row, index) => {
+                row.cells[0].textContent = index + 1;
+            });
+            itemCounter = rows.length;
+        }
+
+        function calculateRow(element) {
+            const row = element.closest('tr');
+            const qty = parseFloat(row.cells[2].querySelector('.editable').textContent) || 0;
+            const unitPrice = parseFloat(row.cells[3].querySelector('.editable').textContent.replace(/,/g, '')) || 0;
+            const amount = qty * unitPrice;
+            
+            row.cells[4].textContent = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            const amountCells = document.querySelectorAll('.amount-cell');
+            let total = 0;
+            
+            amountCells.forEach(cell => {
+                const value = parseFloat(cell.textContent.replace(/,/g, '')) || 0;
+                total += value;
+            });
+            
+            document.getElementById('totalAmount').textContent = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+        }
+
+        // Auto-save to localStorage
+        function saveData() {
+            const editables = document.querySelectorAll('.editable');
+            const data = {};
+            editables.forEach((el, index) => {
+                data[index] = el.innerHTML;
+            });
+            localStorage.setItem('quotationData', JSON.stringify(data));
+        }
+
+        function loadData() {
+            const saved = localStorage.getItem('quotationData');
+            if (saved) {
+                const data = JSON.parse(saved);
+                const editables = document.querySelectorAll('.editable');
+                editables.forEach((el, index) => {
+                    if (data[index]) {
+                        el.innerHTML = data[index];
+                    }
+                });
+            }
+        }
+
+        // Auto-save on content change
+        document.addEventListener('input', function(e) {
+            if (e.target.classList.contains('editable')) {
+                saveData();
+            }
+        });
+
+        // Load saved data on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            calculateTotal();
+        });
+
+        // Save as PDF function
+        async function saveAsPDF() {
+            // Hide buttons before generating PDF
+            const buttons = document.querySelectorAll('.add-item-btn, .remove-btn');
+            buttons.forEach(btn => btn.style.display = 'none');
+            
+            try {
+                // Import html2pdf library
+                const script = document.createElement('script');
+                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+                document.head.appendChild(script);
+                
+                await new Promise(resolve => {
+                    script.onload = resolve;
+                });
+                
+                // Generate filename with date and quote number
+                const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+                const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                const filename = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`;
+                
+                // PDF options
+                const options = {
+                    margin: 10,
+                    filename: filename,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { 
+                        scale: 2,
+                        useCORS: true,
+                        letterRendering: true
+                    },
+                    jsPDF: { 
+                        unit: 'mm', 
+                        format: 'a4', 
+                        orientation: 'portrait',
+                        compress: true
+                    }
+                };
+                
+                // Generate and save PDF
+                await html2pdf().set(options).from(document.querySelector('.quotation-container')).save();
+                
+                // Show success message
+                showMessage('✅ บันทึก PDF สำเร็จ! / PDF saved successfully!', 'success');
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการบันทึก PDF / Error saving PDF', 'error');
+            } finally {
+                // Show buttons again
+                buttons.forEach(btn => btn.style.display = '');
+            }
+        }
+
+        // Show message function
+        function showMessage(message, type) {
+            const messageDiv = document.createElement('div');
+            messageDiv.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                border-radius: 8px;
+                color: white;
+                font-weight: bold;
+                z-index: 1000;
+                animation: slideIn 0.3s ease;
+                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+            `;
+            messageDiv.textContent = message;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            document.body.appendChild(messageDiv);
+            
+            // Remove message after 3 seconds
+            setTimeout(() => {
+                messageDiv.remove();
+                style.remove();
+            }, 3000);
+        }
+
+        // Add save PDF button
+        const addSavePDFButton = () => {
+            const saveBtn = document.createElement('button');
+            saveBtn.textContent = '💾 บันทึก PDF / Save PDF';
+            saveBtn.className = 'add-item-btn';
+            saveBtn.onclick = saveAsPDF;
+            saveBtn.style.marginLeft = '10px';
+            saveBtn.style.background = '#27ae60';
+            saveBtn.addEventListener('mouseover', () => saveBtn.style.background = '#219a52');
+            saveBtn.addEventListener('mouseout', () => saveBtn.style.background = '#27ae60');
+            document.querySelector('.add-item-btn').parentNode.appendChild(saveBtn);
+        };
+
+        document.addEventListener('DOMContentLoaded', addSavePDFButton);
+    </script>
+</body>
+</html>
