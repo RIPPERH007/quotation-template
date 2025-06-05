@@ -460,7 +460,45 @@
             }
         }
         
-      
+        @media (max-width: 768px) {
+            body {
+                padding: 5px;
+                font-size: 11px;
+            }
+            
+            .content {
+                padding: 10px;
+            }
+            
+            .customer-project-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .customer-info {
+                border-right: none;
+                border-bottom: 1px solid #ddd;
+            }
+            
+            .items-table {
+                font-size: 9px;
+            }
+            
+            .items-table th,
+            .items-table td {
+                padding: 4px 2px;
+            }
+            
+            .quotation-title {
+                font-size: 24px;
+                padding: 8px 15px;
+                margin: 0 -15px;
+            }
+            
+            .signature-section {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
     </style>
 </head>
 <body>
