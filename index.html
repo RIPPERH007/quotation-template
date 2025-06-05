@@ -1,1012 +1,970 @@
-<!DOCTYPE html>
+// Initialize
+document.addEventListener('DOMContentLoaded', function() {
+    calculateTotal();
+});<!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ใบเสนอราคา - Quotation Template</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Sarabun', 'Tahoma', Arial, sans-serif;
-            line-height: 1.4;
-            color: #333;
-            background: #f4f6f9;
-            padding: 10px;
-            font-size: 14px;
-        }
-        
-        .quotation-container {
-            max-width: 800px;
-            margin: 0 auto;
-            background: white;
-            box-shadow: 0 0 15px rgba(0,0,0,0.1);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .header-section {
-            text-align: center;
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            border-bottom: 3px solid #3498db;
-        }
-        
-        .thank-you {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 15px;
-        }
-        
-        .quotation-title {
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
-            color: white;
-            padding: 8px 20px;
-            font-size: 28px;
-            font-weight: bold;
-            letter-spacing: 2px;
-            margin: 0 -20px;
-        }
-        
-        .content {
-            padding: 20px;
-        }
-        
-        .quote-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 20px;
-            gap: 20px;
-        }
-        
-        .vendor-info {
-            font-size: 13px;
-            line-height: 1.4;
-            text-align: left;
-            flex: 1;
-        }
-        
-        .vendor-info div {
-            margin-bottom: 3px;
-        }
-        
-        .quote-info {
-            text-align: right;
-            font-size: 13px;
-            flex: 1;
-        }
-        
-        .quote-info div {
-            margin-bottom: 5px;
-        }
-        
-        .quote-info strong {
-            display: inline-block;
-            width: 80px;
-        }
-        
-        .editable {
-            background: #f8f9fa;
-            border: 1px dashed #bdc3c7;
-            padding: 4px 8px;
-            margin: 2px 0;
-            border-radius: 3px;
-            min-height: 18px;
-            transition: all 0.3s ease;
-            display: inline-block;
-            min-width: 100px;
-            cursor: text;
-        }
-        
-        .editable:hover {
-            background: #ecf0f1;
-            border-color: #3498db;
-        }
-        
-        .editable:focus {
-            outline: none;
-            background: white;
-            border-color: #3498db;
-            border-style: solid;
-            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
-        }
-        
-        .customer-project-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
-            margin-bottom: 20px;
-            border: 1px solid #ddd;
-        }
-        
-        .customer-info, .project-info {
-            padding: 15px;
-        }
-        
-        .customer-info {
-            border-right: 1px solid #ddd;
-        }
-        
-        .section-title {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        
-        .info-row {
-            margin-bottom: 8px;
-            font-size: 13px;
-        }
-        
-        .info-label {
-            font-weight: bold;
-            color: #34495e;
-            display: inline-block;
-            width: 120px;
-        }
-        
-        .items-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
-            font-size: 12px;
-            border: 1px solid #ddd;
-        }
-        
-        .items-table th {
-            background: #34495e;
-            color: white;
-            padding: 8px 6px;
-            text-align: center;
-            font-weight: bold;
-            font-size: 11px;
-            border: 1px solid #ddd;
-        }
-        
-        .items-table td {
-            padding: 6px;
-            border: 1px solid #ddd;
-            text-align: center;
-            vertical-align: top;
-        }
-        
-        .items-table tr:nth-child(even) {
-            background: #f8f9fa;
-        }
-        
-        .description-cell {
-            text-align: left !important;
-            max-width: 350px;
-            padding: 8px !important;
-        }
-        
-        .description-cell .editable {
-            min-width: 100%;
-            white-space: pre-wrap;
-            font-size: 11px;
-            line-height: 1.3;
-            min-height: 40px;
-        }
-        
-        .description-list {
-            margin-top: 5px;
-            padding-left: 10px;
-        }
-        
-        .description-list .desc-item {
-            margin-bottom: 3px;
-            font-size: 11px;
-            position: relative;
-        }
-        
-        .desc-item .editable {
-            min-width: 300px;
-            font-size: 11px;
-            line-height: 1.2;
-            border: 1px dashed #ccc;
-            padding: 2px 5px;
-        }
-        
-        .desc-item .editable:hover {
-            border-color: #3498db;
-            background: #f0f8ff;
-        }
-        
-        .desc-item .editable:focus {
-            border-color: #3498db;
-            background: white;
-            box-shadow: 0 0 3px rgba(52, 152, 219, 0.3);
-        }
-        
-        .desc-item .remove-desc-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 2px 6px;
-            border-radius: 2px;
-            cursor: pointer;
-            font-size: 9px;
-            margin-left: 5px;
-            vertical-align: middle;
-        }
-        
-        .desc-item .remove-desc-btn:hover {
-            background: #c0392b;
-        }
-        
-        .add-desc-btn {
-            background: #27ae60;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 10px;
-            margin-top: 5px;
-        }
-        
-        .add-desc-btn:hover {
-            background: #219a52;
-        }
-        
-        .total-row {
-            background: #ecf0f1 !important;
-            font-weight: bold;
-        }
-        
-        .total-row td {
-            padding: 10px !important;
-            border-top: 2px solid #34495e !important;
-        }
-        
-        .payment-terms {
-            background: #f8f9fa;
-            padding: 15px;
-            border: 1px solid #ddd;
-            margin: 20px 0;
-        }
-        
-        .payment-terms-title {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            font-size: 14px;
-        }
-        
-        .payment-terms .editable {
-            width: 100%;
-            min-height: 60px;
-            white-space: pre-wrap;
-        }
-        
-        .signature-section {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 30px;
-            padding-top: 20px;
-        }
-        
-        .signature-box {
-            text-align: center;
-            width: 200px;
-        }
-        
-        .signature-line {
-            border-top: 1px solid #333;
-            margin: 40px 0 10px 0;
-        }
-        
-        .button-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin: 20px 0;
-            justify-content: center;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: bold;
-            transition: all 0.3s ease;
-            color: white;
-        }
-        
-        .btn:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-        
-        .btn-primary {
-            background: #3498db;
-        }
-        
-        .btn-danger {
-            background: #e74c3c;
-        }
-        
-        .btn-success {
-            background: #27ae60;
-        }
-        
-        .remove-btn {
-            background: #e74c3c;
-            color: white;
-            border: none;
-            padding: 4px 8px;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 10px;
-        }
-        
-        .remove-btn:hover {
-            background: #c0392b;
-        }
-        
-        @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
-                font-size: 12px !important;
-                margin: 0 !important;
-            }
-            
-            .quotation-container {
-                box-shadow: none !important;
-                border-radius: 0 !important;
-                max-width: none !important;
-                margin: 0 !important;
-                width: 100% !important;
-            }
-            
-            .btn, .remove-btn, .button-container {
-                display: none !important;
-            }
-            
-            .editable {
-                border: none !important;
-                background: transparent !important;
-                padding: 2px !important;
-                box-shadow: none !important;
-            }
-            
-            .editable:hover,
-            .editable:focus {
-                background: transparent !important;
-                border: none !important;
-                box-shadow: none !important;
-            }
-            
-            .quotation-title {
-                margin: 0 !important;
-                background: #e74c3c !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            .header-section {
-                background: #f8f9fa !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            .items-table th {
-                background: #34495e !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            .total-row {
-                background: #ecf0f1 !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            .payment-terms {
-                background: #f8f9fa !important;
-                -webkit-print-color-adjust: exact !important;
-                color-adjust: exact !important;
-            }
-            
-            @page {
-                margin: 15mm;
-                size: A4;
-            }
-            
-            .customer-project-section {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-            
-            .items-table {
-                break-inside: avoid;
-                page-break-inside: avoid;
-            }
-            
-            .items-table th,
-            .items-table td {
-                font-size: 11px !important;
-                padding: 6px 4px !important;
-                border: 1px solid #333 !important;
-            }
-            
-            .description-cell .editable {
-                font-size: 10px !important;
-            }
-            
-            .description-list div {
-                font-size: 10px !important;
-            }
-            
-            /* Hide any tooltips or floating elements */
-            [title]:after,
-            .tooltip,
-            .hover-text {
-                display: none !important;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            body {
-                padding: 5px;
-                font-size: 12px;
-            }
-            
-            .content {
-                padding: 15px;
-            }
-            
-            .customer-project-section {
-                grid-template-columns: 1fr;
-            }
-            
-            .customer-info {
-                border-right: none;
-                border-bottom: 1px solid #ddd;
-            }
-            
-            .quote-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .quote-info {
-                text-align: left;
-            }
-            
-            .items-table {
-                font-size: 10px;
-            }
-            
-            .items-table th,
-            .items-table td {
-                padding: 4px 2px;
-            }
-            
-            .quotation-title {
-                font-size: 20px;
-                padding: 6px 15px;
-                margin: 0 -15px;
-            }
-            
-            .signature-section {
-                flex-direction: column;
-                gap: 20px;
-            }
-            
-            .info-label {
-                width: 100px;
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .quotation-title {
-                font-size: 18px;
-                letter-spacing: 1px;
-            }
-            
-            .items-table th,
-            .items-table td {
-                font-size: 9px;
-                padding: 3px 1px;
-            }
-            
-            .description-cell .editable {
-                font-size: 9px;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ใบเสนอราคา - Quotation Template</title>
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Sarabun', 'Tahoma', Arial, sans-serif;
+    line-height: 1.4;
+    color: #333;
+    background: #f4f6f9;
+    padding: 10px;
+    font-size: 14px;
+}
+
+.quotation-container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.header-section {
+    text-align: center;
+    padding: 15px 20px;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    border-bottom: 3px solid #3498db;
+}
+
+.thank-you {
+    font-size: 12px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.quotation-title {
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    padding: 8px 20px;
+    font-size: 28px;
+    font-weight: bold;
+    letter-spacing: 2px;
+    margin: 0 -20px;
+}
+
+.content {
+    padding: 20px;
+}
+
+.quote-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 20px;
+    gap: 20px;
+}
+
+.vendor-info {
+    font-size: 13px;
+    line-height: 1.4;
+    text-align: left;
+    flex: 1;
+}
+
+.vendor-info div {
+    margin-bottom: 3px;
+}
+
+.quote-info {
+    text-align: right;
+    font-size: 13px;
+    flex: 1;
+}
+
+.quote-info div {
+    margin-bottom: 5px;
+}
+
+.quote-info strong {
+    display: inline-block;
+    width: 80px;
+}
+
+.editable {
+    background: #f8f9fa;
+    border: 1px dashed #bdc3c7;
+    padding: 4px 8px;
+    margin: 2px 0;
+    border-radius: 3px;
+    min-height: 18px;
+    transition: all 0.3s ease;
+    display: inline-block;
+    min-width: 100px;
+    cursor: text;
+}
+
+.editable:hover {
+    background: #ecf0f1;
+    border-color: #3498db;
+}
+
+.editable:focus {
+    outline: none;
+    background: white;
+    border-color: #3498db;
+    border-style: solid;
+    box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+}
+
+.customer-project-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+    border: 1px solid #ddd;
+}
+
+.customer-info, .project-info {
+    padding: 15px;
+}
+
+.customer-info {
+    border-right: 1px solid #ddd;
+}
+
+.section-title {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.info-row {
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.info-label {
+    font-weight: bold;
+    color: #34495e;
+    display: inline-block;
+    width: 120px;
+}
+
+.items-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+    font-size: 12px;
+    border: 1px solid #ddd;
+}
+
+.items-table th {
+    background: #34495e;
+    color: white;
+    padding: 8px 6px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 11px;
+    border: 1px solid #ddd;
+}
+
+.items-table td {
+    padding: 6px;
+    border: 1px solid #ddd;
+    text-align: center;
+    vertical-align: top;
+}
+
+.items-table tr:nth-child(even) {
+    background: #f8f9fa;
+}
+
+.description-cell {
+    text-align: left !important;
+    max-width: 350px;
+    padding: 8px !important;
+}
+
+.description-cell .editable {
+    min-width: 100%;
+    white-space: pre-wrap;
+    font-size: 11px;
+    line-height: 1.3;
+    min-height: 40px;
+}
+
+.description-list {
+    margin-top: 5px;
+    padding-left: 10px;
+}
+
+.description-list .desc-item {
+    margin-bottom: 3px;
+    font-size: 11px;
+    position: relative;
+}
+
+.desc-item .editable {
+    min-width: 300px;
+    font-size: 11px;
+    line-height: 1.2;
+    border: 1px dashed #ccc;
+    padding: 2px 5px;
+}
+
+.desc-item .editable:hover {
+    border-color: #3498db;
+    background: #f0f8ff;
+}
+
+.desc-item .editable:focus {
+    border-color: #3498db;
+    background: white;
+    box-shadow: 0 0 3px rgba(52, 152, 219, 0.3);
+}
+
+.desc-item .remove-desc-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 2px 6px;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 9px;
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+.desc-item .remove-desc-btn:hover {
+    background: #c0392b;
+}
+
+.add-desc-btn {
+    background: #27ae60;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+    margin-top: 5px;
+}
+
+.add-desc-btn:hover {
+    background: #219a52;
+}
+
+.total-row {
+    background: #ecf0f1 !important;
+    font-weight: bold;
+}
+
+.total-row td {
+    padding: 10px !important;
+    border-top: 2px solid #34495e !important;
+}
+
+.payment-terms {
+    background: #f8f9fa;
+    padding: 15px;
+    border: 1px solid #ddd;
+    margin: 20px 0;
+}
+
+.payment-terms-title {
+    font-weight: bold;
+    color: #2c3e50;
+    margin-bottom: 10px;
+    font-size: 14px;
+}
+
+.payment-terms .editable {
+    width: 100%;
+    min-height: 60px;
+    white-space: pre-wrap;
+}
+
+.signature-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 30px;
+    padding-top: 20px;
+}
+
+.signature-box {
+    text-align: center;
+    width: 200px;
+}
+
+.signature-line {
+    border-top: 1px solid #333;
+    margin: 40px 0 10px 0;
+}
+
+.button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 20px 0;
+    justify-content: center;
+}
+
+.btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    transition: all 0.3s ease;
+    color: white;
+}
+
+.btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
+
+.btn-primary {
+    background: #3498db;
+}
+
+.btn-danger {
+    background: #e74c3c;
+}
+
+.btn-success {
+    background: #27ae60;
+}
+
+.remove-btn {
+    background: #e74c3c;
+    color: white;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    font-size: 10px;
+}
+
+.remove-btn:hover {
+    background: #c0392b;
+}
+
+@media print {
+    body {
+        background: white !important;
+        padding: 0 !important;
+        font-size: 12px !important;
+        margin: 0 !important;
+    }
+    
+    .quotation-container {
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        max-width: none !important;
+        margin: 0 !important;
+        width: 100% !important;
+    }
+    
+    .btn, .remove-btn, .button-container {
+        display: none !important;
+    }
+    
+    .editable {
+        border: none !important;
+        background: transparent !important;
+        padding: 2px !important;
+        box-shadow: none !important;
+    }
+    
+    .editable:hover,
+    .editable:focus {
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+    
+    .quotation-title {
+        margin: 0 !important;
+        background: #e74c3c !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    .header-section {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    .items-table th {
+        background: #34495e !important;
+        color: white !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    .total-row {
+        background: #ecf0f1 !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    .payment-terms {
+        background: #f8f9fa !important;
+        -webkit-print-color-adjust: exact !important;
+        color-adjust: exact !important;
+    }
+    
+    @page {
+        margin: 15mm;
+        size: A4;
+    }
+    
+    .customer-project-section {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    .items-table {
+        break-inside: avoid;
+        page-break-inside: avoid;
+    }
+    
+    .items-table th,
+    .items-table td {
+        font-size: 11px !important;
+        padding: 6px 4px !important;
+        border: 1px solid #333 !important;
+    }
+    
+    .description-cell .editable {
+        font-size: 10px !important;
+    }
+    
+    .description-list div {
+        font-size: 10px !important;
+    }
+    
+    /* Hide any tooltips or floating elements */
+    [title]:after,
+    .tooltip,
+    .hover-text {
+        display: none !important;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        padding: 5px;
+        font-size: 12px;
+    }
+    
+    .content {
+        padding: 15px;
+    }
+    
+    .customer-project-section {
+        grid-template-columns: 1fr;
+    }
+    
+    .customer-info {
+        border-right: none;
+        border-bottom: 1px solid #ddd;
+    }
+    
+    .quote-header {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .quote-info {
+        text-align: left;
+    }
+    
+    .items-table {
+        font-size: 10px;
+    }
+    
+    .items-table th,
+    .items-table td {
+        padding: 4px 2px;
+    }
+    
+    .quotation-title {
+        font-size: 20px;
+        padding: 6px 15px;
+        margin: 0 -15px;
+    }
+    
+    .signature-section {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .info-label {
+        width: 100px;
+    }
+}
+
+@media (max-width: 480px) {
+    .quotation-title {
+        font-size: 18px;
+        letter-spacing: 1px;
+    }
+    
+    .items-table th,
+    .items-table td {
+        font-size: 9px;
+        padding: 3px 1px;
+    }
+    
+    .description-cell .editable {
+        font-size: 9px;
+    }
+}
+</style>
 </head>
 <body>
-    <div class="quotation-container">
-        <div class="header-section">
-            <div class="thank-you">ขอขอบคุณที่ใช้บริการของเรา / Thank you for your business</div>
-            <div class="quotation-title">QUOTATION</div>
+<div class="quotation-container">
+<div class="header-section">
+    <div class="thank-you">ขอขอบคุณที่ใช้บริการของเรา / Thank you for your business</div>
+    <div class="quotation-title">QUOTATION</div>
+</div>
+
+<div class="content">
+    <div class="quote-header">
+        <div class="vendor-info">
+            <div><div class="editable" contenteditable="true">นายภควัฒน์ ขาวนิล</div></div>
+            <div><div class="editable" contenteditable="true">45/200 The Connect Rm.8</div></div>
+            <div><div class="editable" contenteditable="true">เขตบางเขน ตำบลท่าแร้ง</div></div>
+            <div><div class="editable" contenteditable="true">กรุงเทพมหานคร 10220</div></div>
+            <div>โทร: <div class="editable" contenteditable="true">(+66) 065-010-0040</div></div>
+        </div>
+        <div class="quote-info">
+            <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true">QT-20250516-001</div></div>
+            <div><strong>วันที่:</strong> <div class="editable" contenteditable="true">16/05/2025</div></div>
+            <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true">31/05/2025</div></div>
+        </div>
+    </div>
+    
+    <div class="customer-project-section">
+        <div class="customer-info">
+            <div class="section-title">ข้อมูลลูกค้า / Customer Information</div>
+            <div class="info-row">
+                <span class="info-label">ชื่อบริษัท / Company:</span><br>
+                <div class="editable" contenteditable="true">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div>
+            </div>
+            <div class="info-row">
+                <span class="info-label">ที่อยู่ / Address:</span><br>
+                <div class="editable" contenteditable="true">225/708 หมู่ที่ 11 ตำบลบ้านแหวน
+อำเภอหางดง จังหวัดเชียงใหม่ 50230</div>
+            </div>
+            <div class="info-row">
+                <span class="info-label">เลขประจำตัวผู้เสียภาษี / Tax ID:</span><br>
+                <div class="editable" contenteditable="true">0505565016016</div>
+            </div>
         </div>
         
-        <div class="content">
-            <div class="quote-header">
-                <div class="vendor-info">
-                    <div><div class="editable" contenteditable="true">นายภควัฒน์ ขาวนิล</div></div>
-                    <div><div class="editable" contenteditable="true">45/200 The Connect Rm.8</div></div>
-                    <div><div class="editable" contenteditable="true">เขตบางเขน ตำบลท่าแร้ง</div></div>
-                    <div><div class="editable" contenteditable="true">กรุงเทพมหานคร 10220</div></div>
-                    <div>โทร: <div class="editable" contenteditable="true">(+66) 065-010-0040</div></div>
-                </div>
-                <div class="quote-info">
-                    <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true">QT-20250516-001</div></div>
-                    <div><strong>วันที่:</strong> <div class="editable" contenteditable="true">16/05/2025</div></div>
-                    <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true">31/05/2025</div></div>
-                </div>
+        <div class="project-info">
+            <div class="section-title">รายละเอียดโครงการ / Project Details</div>
+            <div class="info-row">
+                <span class="info-label">ชื่อโครงการ / Project:</span><br>
+                <div class="editable" contenteditable="true">LockBox Kiosk</div>
             </div>
-            
-            <div class="customer-project-section">
-                <div class="customer-info">
-                    <div class="section-title">ข้อมูลลูกค้า / Customer Information</div>
-                    <div class="info-row">
-                        <span class="info-label">ชื่อบริษัท / Company:</span><br>
-                        <div class="editable" contenteditable="true">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">ที่อยู่ / Address:</span><br>
-                        <div class="editable" contenteditable="true">225/708 หมู่ที่ 11 ตำบลบ้านแหวน
-อำเภอหางดง จังหวัดเชียงใหม่ 50230</div>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">เลขประจำตัวผู้เสียภาษี / Tax ID:</span><br>
-                        <div class="editable" contenteditable="true">0505565016016</div>
-                    </div>
-                </div>
-                
-                <div class="project-info">
-                    <div class="section-title">รายละเอียดโครงการ / Project Details</div>
-                    <div class="info-row">
-                        <span class="info-label">ชื่อโครงการ / Project:</span><br>
-                        <div class="editable" contenteditable="true">LockBox Kiosk</div>
-                    </div>
-                    <div class="info-row">
-                        <span class="info-label">ระยะเวลาดำเนินการ / Timeline:</span><br>
-                        <div class="editable" contenteditable="true">15 วัน</div>
-                    </div>
-                </div>
-            </div>
-            
-            <table class="items-table" id="itemsTable">
-                <thead>
-                    <tr>
-                        <th style="width: 40px;">ลำดับ<br>No.</th>
-                        <th>รายละเอียด<br>Description</th>
-                        <th style="width: 60px;">จำนวน<br>Qty</th>
-                        <th style="width: 100px;">ราคาต่อหน่วย<br>Unit Price</th>
-                        <th style="width: 100px;">จำนวนเงิน<br>Amount</th>
-                        <th style="width: 60px;">Action</th>
-                    </tr>
-                </thead>
-                <tbody id="itemsBody">
-                    <tr>
-                        <td>1</td>
-                        <td class="description-cell">
-                            <div class="editable" contenteditable="true">Leo Phase 2 (Back-end) (15 Day)</div>
-                            <div class="description-list">
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">แก้ไข api register ให้กับ booking web ตัวใหม่</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">api ชำระด้วย qr</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">api ชำระด้วย ksher</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">api ชำระด้วย edc</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ mobile app</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ kiosk</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการและโครงการให้ MainWeb</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <div class="desc-item">
-                                    <div class="editable" contenteditable="true">ตรวจสอบการ monitor สมัครบริการและชำระเงิน</div>
-                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                                </div>
-                                <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
-                            </div>
-                        </td>
-                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
-                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">18,000.00</div></td>
-                        <td class="amount-cell">18,000.00</td>
-                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
-                    </tr>
-                </tbody>
-                <tfoot>
-                    <tr class="total-row">
-                        <td colspan="4" style="text-align: right; font-weight: bold;">รวมเป็นเงิน / Total</td>
-                        <td style="font-weight: bold;"><span id="totalAmount">18,000.00</span></td>
-                        <td></td>
-                    </tr>
-                </tfoot>
-            </table>
-            
-            <div class="button-container">
-                <button class="btn btn-primary" onclick="addRow()">➕ เพิ่มรายการ</button>
-                <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึก PDF</button>
-                <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button>
-            </div>
-            
-            <div class="payment-terms">
-                <div class="payment-terms-title">เงื่อนไขการชำระเงิน / Payment Terms</div>
-                <div class="editable" contenteditable="true">เงื่อนไขการชำระเงินสำหรับระบบ Api Leo แบ่งเป็น 2 ช่วงเวลา คือ
-1) หลังจากยืนยันการพัฒนา 50% (9,000 บาท)
-2) หลังจากเริ่มใช้งาน 50% (9,000 บาท)</div>
-            </div>
-            
-            <div class="signature-section">
-                <div class="signature-box">
-                    <div style="text-align: center;">......................................................................</div>
-                    <div style="text-align: center; margin-top: 10px;">(บริษัท ก๊อท อิท โซลูชันส์ จำกัด)</div>
-                    <div style="text-align: center;">วันที่ / Date: ........................................</div>
-                </div>
-                
-                <div class="signature-box">
-                    <div style="text-align: center;">......................................................................</div>
-                    <div style="text-align: center; margin-top: 10px;">(ผู้เสนอราคา / Vendor)</div>
-                    <div style="text-align: center;">วันที่ / Date: ........................................</div>
-                </div>
+            <div class="info-row">
+                <span class="info-label">ระยะเวลาดำเนินการ / Timeline:</span><br>
+                <div class="editable" contenteditable="true">15 วัน</div>
             </div>
         </div>
     </div>
-
-    <script>
-        let itemCounter = 1;
-
-        function addRow() {
-            itemCounter++;
-            const tbody = document.getElementById('itemsBody');
-            const newRow = tbody.insertRow();
-            
-                            newRow.innerHTML = `
-                <td>${itemCounter}</td>
+    
+    <table class="items-table" id="itemsTable">
+        <thead>
+            <tr>
+                <th style="width: 40px;">ลำดับ<br>No.</th>
+                <th>รายละเอียด<br>Description</th>
+                <th style="width: 60px;">จำนวน<br>Qty</th>
+                <th style="width: 100px;">ราคาต่อหน่วย<br>Unit Price</th>
+                <th style="width: 100px;">จำนวนเงิน<br>Amount</th>
+                <th style="width: 60px;">Action</th>
+            </tr>
+        </thead>
+        <tbody id="itemsBody">
+            <tr>
+                <td>1</td>
                 <td class="description-cell">
-                    <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+                    <div class="editable" contenteditable="true">Leo Phase 2 (Back-end) (15 Day)</div>
                     <div class="description-list">
                         <div class="desc-item">
-                            <div class="editable" contenteditable="true">รายละเอียดงาน 1</div>
+                            <div class="editable" contenteditable="true">แก้ไข api register ให้กับ booking web ตัวใหม่</div>
                             <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
                         </div>
                         <div class="desc-item">
-                            <div class="editable" contenteditable="true">รายละเอียดงาน 2</div>
+                            <div class="editable" contenteditable="true">api ชำระด้วย qr</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">api ชำระด้วย ksher</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">api ชำระด้วย edc</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ mobile app</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ kiosk</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการและโครงการให้ MainWeb</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">ตรวจสอบการ monitor สมัครบริการและชำระเงิน</div>
                             <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
                         </div>
                         <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
                     </div>
                 </td>
                 <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
-                <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
-                <td class="amount-cell">0.00</td>
+                <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">18,000.00</div></td>
+                <td class="amount-cell">18,000.00</td>
                 <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
-            `;
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr class="total-row">
+                <td colspan="4" style="text-align: right; font-weight: bold;">รวมเป็นเงิน / Total</td>
+                <td style="font-weight: bold;"><span id="totalAmount">18,000.00</span></td>
+                <td></td>
+            </tr>
+        </tfoot>
+    </table>
+    
+    <div class="button-container">
+        <button class="btn btn-primary" onclick="addRow()">➕ เพิ่มรายการ</button>
+        <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึก PDF</button>
+        <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button>
+    </div>
+    
+    <div class="payment-terms">
+        <div class="payment-terms-title">เงื่อนไขการชำระเงิน / Payment Terms</div>
+        <div class="editable" contenteditable="true">เงื่อนไขการชำระเงินสำหรับระบบ Api Leo แบ่งเป็น 2 ช่วงเวลา คือ
+1) หลังจากยืนยันการพัฒนา 50% (9,000 บาท)
+2) หลังจากเริ่มใช้งาน 50% (9,000 บาท)</div>
+    </div>
+    
+    <div class="signature-section">
+        <div class="signature-box">
+            <div style="text-align: center;">......................................................................</div>
+            <div style="text-align: center; margin-top: 10px;">(บริษัท ก๊อท อิท โซลูชันส์ จำกัด)</div>
+            <div style="text-align: center;">วันที่ / Date: ........................................</div>
+        </div>
+        
+        <div class="signature-box">
+            <div style="text-align: center;">......................................................................</div>
+            <div style="text-align: center; margin-top: 10px;">(ผู้เสนอราคา / Vendor)</div>
+            <div style="text-align: center;">วันที่ / Date: ........................................</div>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+let itemCounter = 1;
+
+function addRow() {
+    itemCounter++;
+    const tbody = document.getElementById('itemsBody');
+    const newRow = tbody.insertRow();
+    
+                    newRow.innerHTML = `
+        <td>${itemCounter}</td>
+        <td class="description-cell">
+            <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+            <div class="description-list">
+                <div class="desc-item">
+                    <div class="editable" contenteditable="true">รายละเอียดงาน 1</div>
+                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                </div>
+                <div class="desc-item">
+                    <div class="editable" contenteditable="true">รายละเอียดงาน 2</div>
+                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                </div>
+                <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
+            </div>
+        </td>
+        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
+        <td class="amount-cell">0.00</td>
+        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+    `;
+    
+    updateRowNumbers();
+    calculateTotal();
+}
+
+function removeRow(button) {
+    const row = button.closest('tr');
+    row.remove();
+    updateRowNumbers();
+    calculateTotal();
+}
+
+function updateRowNumbers() {
+    const rows = document.querySelectorAll('#itemsBody tr');
+    rows.forEach((row, index) => {
+        row.cells[0].textContent = index + 1;
+    });
+    itemCounter = rows.length;
+}
+
+function calculateRow(element) {
+    const row = element.closest('tr');
+    const qty = parseFloat(row.cells[2].querySelector('.editable').textContent) || 0;
+    const unitPrice = parseFloat(row.cells[3].querySelector('.editable').textContent.replace(/,/g, '')) || 0;
+    const amount = qty * unitPrice;
+    
+    row.cells[4].textContent = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    calculateTotal();
+}
+
+function calculateTotal() {
+    const amountCells = document.querySelectorAll('.amount-cell');
+    let total = 0;
+    
+    amountCells.forEach(cell => {
+        const value = parseFloat(cell.textContent.replace(/,/g, '')) || 0;
+        total += value;
+    });
+    
+    document.getElementById('totalAmount').textContent = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+}
+
+// Save as PDF function - Real PDF generation
+async function saveAsPDF() {
+    try {
+        // Load html2pdf library if not already loaded
+        if (typeof html2pdf === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
+            document.head.appendChild(script);
             
-            updateRowNumbers();
-            calculateTotal();
-        }
-
-        function removeRow(button) {
-            const row = button.closest('tr');
-            row.remove();
-            updateRowNumbers();
-            calculateTotal();
-        }
-
-        function updateRowNumbers() {
-            const rows = document.querySelectorAll('#itemsBody tr');
-            rows.forEach((row, index) => {
-                row.cells[0].textContent = index + 1;
+            await new Promise((resolve, reject) => {
+                script.onload = resolve;
+                script.onerror = reject;
             });
-            itemCounter = rows.length;
-        }
-
-        function calculateRow(element) {
-            const row = element.closest('tr');
-            const qty = parseFloat(row.cells[2].querySelector('.editable').textContent) || 0;
-            const unitPrice = parseFloat(row.cells[3].querySelector('.editable').textContent.replace(/,/g, '')) || 0;
-            const amount = qty * unitPrice;
-            
-            row.cells[4].textContent = amount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            const amountCells = document.querySelectorAll('.amount-cell');
-            let total = 0;
-            
-            amountCells.forEach(cell => {
-                const value = parseFloat(cell.textContent.replace(/,/g, '')) || 0;
-                total += value;
-            });
-            
-            document.getElementById('totalAmount').textContent = total.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
-        }
-
-        // Save as PDF function
-        function saveAsPDF() {
-            // Hide all interactive elements
-            const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, [title]');
-            const originalStates = [];
-            
-            interactiveElements.forEach((element, index) => {
-                originalStates[index] = {
-                    display: element.style.display,
-                    title: element.getAttribute('title')
-                };
-                element.style.display = 'none';
-                element.removeAttribute('title');
-            });
-            
-            // Remove any hover states and focus from editable elements
-            const editables = document.querySelectorAll('.editable');
-            editables.forEach(el => {
-                el.blur();
-                el.style.borderStyle = 'none';
-                el.style.background = 'transparent';
-            });
-            
-            // Add enhanced print styles
-            const printStyle = document.createElement('style');
-            printStyle.id = 'enhanced-print-style';
-            printStyle.innerHTML = `
-                @media print {
-                    * {
-                        -webkit-print-color-adjust: exact !important;
-                        color-adjust: exact !important;
-                    }
-                    
-                    body { 
-                        margin: 0 !important; 
-                        padding: 0 !important; 
-                        background: white !important; 
-                        font-size: 12px !important;
-                        width: 100% !important;
-                    }
-                    
-                    .quotation-container { 
-                        box-shadow: none !important; 
-                        border-radius: 0 !important;
-                        margin: 0 !important;
-                        max-width: none !important;
-                        width: 100% !important;
-                    }
-                    
-                    .btn, .remove-btn, .button-container, 
-                    [title], .tooltip, .hover-text {
-                        display: none !important;
-                        visibility: hidden !important;
-                    }
-                    
-                    .editable { 
-                        border: none !important; 
-                        background: transparent !important; 
-                        padding: 1px !important;
-                        box-shadow: none !important;
-                        outline: none !important;
-                    }
-                    
-                    .editable:hover, .editable:focus, .editable:active {
-                        background: transparent !important;
-                        border: none !important;
-                        box-shadow: none !important;
-                        outline: none !important;
-                    }
-                    
-                    .header-section {
-                        background: #f8f9fa !important;
-                        border-bottom: 3px solid #3498db !important;
-                    }
-                    
-                    .quotation-title {
-                        background: #e74c3c !important;
-                        color: white !important;
-                        margin: 0 !important;
-                    }
-                    
-                    .items-table {
-                        border-collapse: collapse !important;
-                        width: 100% !important;
-                    }
-                    
-                    .items-table th {
-                        background: #34495e !important;
-                        color: white !important;
-                        border: 1px solid #333 !important;
-                        font-size: 11px !important;
-                        padding: 6px 4px !important;
-                    }
-                    
-                    .items-table td {
-                        border: 1px solid #333 !important;
-                        font-size: 11px !important;
-                        padding: 6px 4px !important;
-                    }
-                    
-                    .total-row {
-                        background: #ecf0f1 !important;
-                    }
-                    
-                    .total-row td {
-                        border-top: 2px solid #34495e !important;
-                    }
-                    
-                    .payment-terms {
-                        background: #f8f9fa !important;
-                        border: 1px solid #ddd !important;
-                    }
-                    
-                    .customer-project-section {
-                        border: 1px solid #ddd !important;
-                    }
-                    
-                    .customer-info {
-                        border-right: 1px solid #ddd !important;
-                    }
-                    
-                    @page { 
-                        margin: 12mm !important; 
-                        size: A4 !important;
-                    }
-                }
-            `;
-            document.head.appendChild(printStyle);
-            
-            // Wait a moment for styles to apply
-            setTimeout(() => {
-                // Show instruction without tooltip
-                const instruction = document.createElement('div');
-                instruction.id = 'print-instruction';
-                instruction.style.cssText = `
-                    position: fixed;
-                    top: 10px;
-                    left: 50%;
-                    transform: translateX(-50%);
-                    background: #3498db;
-                    color: white;
-                    padding: 10px 20px;
-                    border-radius: 5px;
-                    z-index: 9999;
-                    font-weight: bold;
-                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                `;
-                instruction.textContent = '📄 กรุณาเลือก "Save as PDF" ในหน้าต่างการพิมพ์';
-                document.body.appendChild(instruction);
-                
-                // Trigger print
-                window.print();
-                
-                // Cleanup after print
-                setTimeout(() => {
-                    // Remove instruction
-                    const instructionEl = document.getElementById('print-instruction');
-                    if (instructionEl) instructionEl.remove();
-                    
-                    // Restore all elements
-                    interactiveElements.forEach((element, index) => {
-                        element.style.display = originalStates[index].display;
-                        if (originalStates[index].title) {
-                            element.setAttribute('title', originalStates[index].title);
-                        }
-                    });
-                    
-                    // Restore editable styles
-                    editables.forEach(el => {
-                        el.style.borderStyle = '';
-                        el.style.background = '';
-                    });
-                    
-                    // Remove print styles
-                    const printStyleEl = document.getElementById('enhanced-print-style');
-                    if (printStyleEl) printStyleEl.remove();
-                    
-                }, 2000);
-            }, 300);
         }
         
-        // Download as HTML
-        function downloadAsHTML() {
-            const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container');
-            buttons.forEach(btn => btn.style.display = 'none');
+        // Hide all interactive elements
+        const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn');
+        const originalStates = [];
+        
+        interactiveElements.forEach((element, index) => {
+            originalStates[index] = element.style.display;
+            element.style.display = 'none';
+        });
+        
+        // Convert all editable elements to plain text
+        const editables = document.querySelectorAll('.editable');
+        const editableStates = [];
+        
+        editables.forEach((el, index) => {
+            editableStates[index] = {
+                contentEditable: el.contentEditable,
+                style: el.style.cssText
+            };
             
-            const htmlContent = `<!DOCTYPE html>
+            el.contentEditable = 'false';
+            el.style.border = 'none';
+            el.style.background = 'transparent';
+            el.style.padding = '0';
+            el.style.cursor = 'default';
+        });
+        
+        // Add dashes to description items for PDF
+        const descItems = document.querySelectorAll('.desc-item');
+        descItems.forEach(item => {
+            const text = item.querySelector('.editable');
+            if (text && !text.textContent.startsWith('-')) {
+                text.textContent = '- ' + text.textContent;
+            }
+        });
+        
+        // Generate filename
+        const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+        const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+        const filename = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`;
+        
+        // PDF options for better quality
+        const options = {
+            margin: [15, 15, 15, 15],
+            filename: filename,
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { 
+                scale: 2,
+                useCORS: true,
+                letterRendering: true,
+                backgroundColor: '#ffffff'
+            },
+            jsPDF: { 
+                unit: 'mm', 
+                format: 'a4', 
+                orientation: 'portrait'
+            }
+        };
+        
+        // Show loading message
+        showMessage('🔄 กำลังสร้าง PDF กรุณารอสักครู่...', 'info');
+        
+        // Generate PDF
+        await html2pdf().set(options).from(document.querySelector('.quotation-container')).save();
+        
+        // Success message
+        showMessage('✅ บันทึก PDF สำเร็จ!', 'success');
+        
+        // Restore all states
+        interactiveElements.forEach((element, index) => {
+            element.style.display = originalStates[index];
+        });
+        
+        editables.forEach((el, index) => {
+            el.contentEditable = editableStates[index].contentEditable;
+            el.style.cssText = editableStates[index].style;
+        });
+        
+        // Remove dashes that were added for PDF
+        descItems.forEach(item => {
+            const text = item.querySelector('.editable');
+            if (text && text.textContent.startsWith('- ')) {
+                text.textContent = text.textContent.substring(2);
+            }
+        });
+        
+    } catch (error) {
+        console.error('PDF generation error:', error);
+        
+        // Fallback to print method
+        showMessage('⚠️ กำลังใช้วิธีสำรอง กรุณาเลือก "Save as PDF"', 'info');
+        
+        setTimeout(() => {
+            // Hide elements for print
+            const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn');
+            interactiveElements.forEach(el => el.style.display = 'none');
+            
+            // Print
+            window.print();
+            
+            // Restore elements
+            setTimeout(() => {
+                interactiveElements.forEach(el => el.style.display = '');
+            }, 1000);
+        }, 500);
+    }
+}
+
+// Download as HTML
+function downloadAsHTML() {
+    const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container');
+    buttons.forEach(btn => btn.style.display = 'none');
+    
+    const htmlContent = `<!DOCTYPE html>
 <html lang="th">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ใบเสนอราคา</title>
-    <style>${document.querySelector('style').textContent}</style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ใบเสนอราคา</title>
+<style>${document.querySelector('style').textContent}</style>
 </head>
 <body>
-    ${document.querySelector('.quotation-container').outerHTML}
+${document.querySelector('.quotation-container').outerHTML}
 </body>
 </html>`;
-            
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            
-            const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
-            const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-            a.download = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.html`;
-            a.href = url;
-            
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            buttons.forEach(btn => btn.style.display = '');
-            showMessage('✅ ดาวน์โหลด HTML สำเร็จ!', 'success');
-        }
+    
+    const blob = new Blob([htmlContent], { type: 'text/html' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    
+    const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+    const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+    a.download = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.html`;
+    a.href = url;
+    
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    buttons.forEach(btn => btn.style.display = '');
+    showMessage('✅ ดาวน์โหลด HTML สำเร็จ!', 'success');
+}
 
-        // Show message function
-        function showMessage(message, type) {
-            const messageDiv = document.createElement('div');
-            messageDiv.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 15px 20px;
-                border-radius: 8px;
-                color: white;
-                font-weight: bold;
-                z-index: 1000;
-                max-width: 350px;
-                animation: slideIn 0.3s ease;
-                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-            `;
-            messageDiv.textContent = message;
-            
-            const style = document.createElement('style');
-            style.textContent = `
-                @keyframes slideIn {
-                    from { transform: translateX(100%); opacity: 0; }
-                    to { transform: translateX(0); opacity: 1; }
-                }
-            `;
-            if (!document.querySelector('style[data-animation]')) {
-                style.setAttribute('data-animation', 'true');
-                document.head.appendChild(style);
-            }
-            
-            document.body.appendChild(messageDiv);
-            
-            setTimeout(() => {
-                messageDiv.remove();
-            }, 4000);
+// Show message function
+function showMessage(message, type) {
+    const messageDiv = document.createElement('div');
+    messageDiv.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 15px 20px;
+        border-radius: 8px;
+        color: white;
+        font-weight: bold;
+        z-index: 1000;
+        max-width: 350px;
+        animation: slideIn 0.3s ease;
+        background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+        box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    `;
+    messageDiv.textContent = message;
+    
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
         }
+    `;
+    if (!document.querySelector('style[data-animation]')) {
+        style.setAttribute('data-animation', 'true');
+        document.head.appendChild(style);
+    }
+    
+    document.body.appendChild(messageDiv);
+    
+    setTimeout(() => {
+        messageDiv.remove();
+    }, 4000);
+}
 
-        // Initialize
-        document.addEventListener('DOMContentLoaded', function() {
-            calculateTotal();
-        });
-    </script>
+// Add description item
+function addDescItem(button) {
+    const descList = button.parentElement;
+    const newDescItem = document.createElement('div');
+    newDescItem.className = 'desc-item';
+    newDescItem.innerHTML = `
+        <div class="editable" contenteditable="true">รายละเอียดใหม่</div>
+        <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+    `;
+    
+    descList.insertBefore(newDescItem, button);
+}
+
+// Remove description item
+function removeDescItem(button) {
+    const descItem = button.parentElement;
+    descItem.remove();
+}
+</script>
 </body>
 </html>
