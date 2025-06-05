@@ -350,6 +350,7 @@
         }
 
         
+        
         @media print {
             body {
                 background: white !important;
@@ -569,6 +570,7 @@
                         <th style="width: 60px;">จำนวน<br>Qty</th>
                         <th style="width: 100px;">ราคาต่อหน่วย<br>Unit Price</th>
                         <th style="width: 100px;">จำนวนเงิน<br>Amount</th>
+                        <th style="width: 60px;">Action</th>
                     </tr>
                 </thead>
                 <tbody id="itemsBody">
@@ -614,13 +616,15 @@
                         </td>
                         <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
                         <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">18,000.00</div></td>
-                        <td class="amount-cell">18,000.00 <button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                        <td class="amount-cell">18,000.00</td>
+                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
                     </tr>
                 </tbody>
                 <tfoot>
                     <tr class="total-row">
                         <td colspan="4" style="text-align: right; font-weight: bold;">รวมเป็นเงิน / Total</td>
                         <td style="font-weight: bold;"><span id="totalAmount">18,000.00</span></td>
+                        <td></td>
                     </tr>
                 </tfoot>
             </table>
@@ -628,7 +632,7 @@
             <div class="button-container">
                 <button class="btn btn-primary" onclick="addRow()">➕ เพิ่มรายการ</button>
                 <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึก PDF</button>
-                <!-- <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button> -->
+                <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button>
             </div>
             
             <div class="payment-terms">
@@ -681,6 +685,7 @@
                 <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
                 <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
                 <td class="amount-cell">0.00</td>
+                <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
             `;
             
             updateRowNumbers();
@@ -760,8 +765,15 @@
                 
                 // Hide all interactive elements
                 const interactiveElements = document.querySelectorAll('.btn, .remove-btn,  .button-container, .remove-desc-btn, .add-desc-btn');
-
+                const actionColumns = document.querySelectorAll('.items-table th:last-child, .items-table td:last-child');
+                const allElementsToHide = [...interactiveElements, ...actionColumns];
                 const originalStates = [];
+                
+                allElementsToHide.forEach((element, index) => {
+                    originalStates[index] = element.style.display;
+                    element.style.display = 'none';
+                });
+
                 
                 interactiveElements.forEach((element, index) => {
                     originalStates[index] = element.style.display;
@@ -779,7 +791,6 @@
                 };
                 
                 // Optimize for PDF - compact layout
-                container.style.maxWidth = '190mm';
                 container.style.margin = '0';
                 container.style.padding = '0';
                 container.style.boxShadow = 'none';
@@ -818,10 +829,11 @@
                     }
                 });
                 
-                // Generate filename
+                // Generate filename based on project name
+                const projectName = document.querySelector('.project-info .editable').textContent || 'Project';
                 const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
                 const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-                const filename = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`;
+                const filename = `${projectName.replace(/[^a-zA-Z0-9ก-ฮ]/g, '-')}-${quoteNumber.replace(/[^a-zA-Z0-9]/g, '-')}-${today}.pdf`;
                 
                 // Show loading message
                 showMessage('🔄 กำลังสร้าง PDF กรุณารอสักครู่...', 'info');
@@ -832,7 +844,7 @@
                     filename: filename,
                     image: { type: 'jpeg', quality: 1 },
                     html2canvas: { 
-                        scale: 1.3,
+                        scale: 1.2,
                         useCORS: true,
                         letterRendering: true,
                         backgroundColor: '#ffffff',
@@ -894,7 +906,7 @@
                 console.error('PDF generation error:', error);
                 
                 // Restore elements in case of error
-                const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn');
+                const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .items-table th:last-child, .items-table td:last-child');
                 interactiveElements.forEach(el => el.style.display = '');
                 
                 // Fallback to print method
@@ -902,7 +914,7 @@
                 
                 setTimeout(() => {
                     // Hide elements for print
-                    const elementsToHide = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn');
+                    const elementsToHide = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .items-table th:last-child, .items-table td:last-child');
                     elementsToHide.forEach(el => el.style.display = 'none');
                     
                     // Print
