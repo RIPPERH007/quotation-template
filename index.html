@@ -39,12 +39,6 @@
         .thank-you {
             font-size: 12px;
             color: #666;
-            margin-bottom: 10px;
-        }
-        
-        .vendor-info {
-            font-size: 13px;
-            line-height: 1.3;
             margin-bottom: 15px;
         }
         
@@ -65,13 +59,26 @@
         .quote-header {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             margin-bottom: 20px;
             gap: 20px;
+        }
+        
+        .vendor-info {
+            font-size: 13px;
+            line-height: 1.4;
+            text-align: left;
+            flex: 1;
+        }
+        
+        .vendor-info div {
+            margin-bottom: 3px;
         }
         
         .quote-info {
             text-align: right;
             font-size: 13px;
+            flex: 1;
         }
         
         .quote-info div {
@@ -192,9 +199,60 @@
             padding-left: 10px;
         }
         
-        .description-list div {
+        .description-list .desc-item {
             margin-bottom: 3px;
             font-size: 11px;
+            position: relative;
+        }
+        
+        .desc-item .editable {
+            min-width: 300px;
+            font-size: 11px;
+            line-height: 1.2;
+            border: 1px dashed #ccc;
+            padding: 2px 5px;
+        }
+        
+        .desc-item .editable:hover {
+            border-color: #3498db;
+            background: #f0f8ff;
+        }
+        
+        .desc-item .editable:focus {
+            border-color: #3498db;
+            background: white;
+            box-shadow: 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+        
+        .desc-item .remove-desc-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 2px 6px;
+            border-radius: 2px;
+            cursor: pointer;
+            font-size: 9px;
+            margin-left: 5px;
+            vertical-align: middle;
+        }
+        
+        .desc-item .remove-desc-btn:hover {
+            background: #c0392b;
+        }
+        
+        .add-desc-btn {
+            background: #27ae60;
+            color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 10px;
+            margin-top: 5px;
+        }
+        
+        .add-desc-btn:hover {
+            background: #219a52;
         }
         
         .total-row {
@@ -296,15 +354,18 @@
         
         @media print {
             body {
-                background: white;
-                padding: 0;
-                font-size: 12px;
+                background: white !important;
+                padding: 0 !important;
+                font-size: 12px !important;
+                margin: 0 !important;
             }
             
             .quotation-container {
-                box-shadow: none;
-                border-radius: 0;
-                max-width: none;
+                box-shadow: none !important;
+                border-radius: 0 !important;
+                max-width: none !important;
+                margin: 0 !important;
+                width: 100% !important;
             }
             
             .btn, .remove-btn, .button-container {
@@ -315,10 +376,46 @@
                 border: none !important;
                 background: transparent !important;
                 padding: 2px !important;
+                box-shadow: none !important;
+            }
+            
+            .editable:hover,
+            .editable:focus {
+                background: transparent !important;
+                border: none !important;
+                box-shadow: none !important;
             }
             
             .quotation-title {
                 margin: 0 !important;
+                background: #e74c3c !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            .header-section {
+                background: #f8f9fa !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            .items-table th {
+                background: #34495e !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            .total-row {
+                background: #ecf0f1 !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
+            }
+            
+            .payment-terms {
+                background: #f8f9fa !important;
+                -webkit-print-color-adjust: exact !important;
+                color-adjust: exact !important;
             }
             
             @page {
@@ -328,20 +425,34 @@
             
             .customer-project-section {
                 break-inside: avoid;
+                page-break-inside: avoid;
             }
             
             .items-table {
                 break-inside: avoid;
+                page-break-inside: avoid;
             }
             
             .items-table th,
             .items-table td {
-                font-size: 10px;
-                padding: 4px;
+                font-size: 11px !important;
+                padding: 6px 4px !important;
+                border: 1px solid #333 !important;
             }
             
             .description-cell .editable {
-                font-size: 10px;
+                font-size: 10px !important;
+            }
+            
+            .description-list div {
+                font-size: 10px !important;
+            }
+            
+            /* Hide any tooltips or floating elements */
+            [title]:after,
+            .tooltip,
+            .hover-text {
+                display: none !important;
             }
         }
         
@@ -420,19 +531,18 @@
     <div class="quotation-container">
         <div class="header-section">
             <div class="thank-you">ขอขอบคุณที่ใช้บริการของเรา / Thank you for your business</div>
-            <div class="vendor-info">
-                <div class="editable" contenteditable="true">นายภควัฒน์ ขาวนิล</div><br>
-                <div class="editable" contenteditable="true">45/200 The Connect Rm.8</div><br>
-                <div class="editable" contenteditable="true">เขตบางเขน ตำบลท่าแร้ง</div><br>
-                <div class="editable" contenteditable="true">กรุงเทพมหานคร 10220</div><br>
-                โทร: <div class="editable" contenteditable="true">(+66) 065-010-0040</div>
-            </div>
             <div class="quotation-title">QUOTATION</div>
         </div>
         
         <div class="content">
             <div class="quote-header">
-                <div style="flex: 1;"></div>
+                <div class="vendor-info">
+                    <div><div class="editable" contenteditable="true">นายภควัฒน์ ขาวนิล</div></div>
+                    <div><div class="editable" contenteditable="true">45/200 The Connect Rm.8</div></div>
+                    <div><div class="editable" contenteditable="true">เขตบางเขน ตำบลท่าแร้ง</div></div>
+                    <div><div class="editable" contenteditable="true">กรุงเทพมหานคร 10220</div></div>
+                    <div>โทร: <div class="editable" contenteditable="true">(+66) 065-010-0040</div></div>
+                </div>
                 <div class="quote-info">
                     <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true">QT-20250516-001</div></div>
                     <div><strong>วันที่:</strong> <div class="editable" contenteditable="true">16/05/2025</div></div>
@@ -488,14 +598,39 @@
                         <td class="description-cell">
                             <div class="editable" contenteditable="true">Leo Phase 2 (Back-end) (15 Day)</div>
                             <div class="description-list">
-                                <div>- แก้ไข api register ให้กับ booking web ตัวใหม่</div>
-                                <div>- api ชำระด้วย qr</div>
-                                <div>- api ชำระด้วย ksher</div>
-                                <div>- api ชำระด้วย edc</div>
-                                <div>- ตรวจสอบ query การแสดงบริการของลูกค้าให้ mobile app</div>
-                                <div>- ตรวจสอบ query การแสดงบริการของลูกค้าให้ kiosk</div>
-                                <div>- ตรวจสอบ query การแสดงบริการและโครงการให้ MainWeb</div>
-                                <div>- ตรวจสอบการ monitor สมัครบริการและชำระเงิน</div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">แก้ไข api register ให้กับ booking web ตัวใหม่</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">api ชำระด้วย qr</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">api ชำระด้วย ksher</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">api ชำระด้วย edc</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ mobile app</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการของลูกค้าให้ kiosk</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">ตรวจสอบ query การแสดงบริการและโครงการให้ MainWeb</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <div class="desc-item">
+                                    <div class="editable" contenteditable="true">ตรวจสอบการ monitor สมัครบริการและชำระเงิน</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                                <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
                             </div>
                         </td>
                         <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
@@ -550,14 +685,20 @@
             const tbody = document.getElementById('itemsBody');
             const newRow = tbody.insertRow();
             
-            newRow.innerHTML = `
+                            newRow.innerHTML = `
                 <td>${itemCounter}</td>
                 <td class="description-cell">
                     <div class="editable" contenteditable="true">รายละเอียดงาน</div>
                     <div class="description-list">
-                        <div>- รายละเอียดงาน 1</div>
-                        <div>- รายละเอียดงาน 2</div>
-                        <div>- รายละเอียดงาน 3</div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">รายละเอียดงาน 1</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <div class="desc-item">
+                            <div class="editable" contenteditable="true">รายละเอียดงาน 2</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
                     </div>
                 </td>
                 <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
@@ -609,46 +750,183 @@
 
         // Save as PDF function
         function saveAsPDF() {
-            const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container');
-            const originalDisplay = [];
-            buttons.forEach((btn, index) => {
-                originalDisplay[index] = btn.style.display;
-                btn.style.display = 'none';
+            // Hide all interactive elements
+            const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, [title]');
+            const originalStates = [];
+            
+            interactiveElements.forEach((element, index) => {
+                originalStates[index] = {
+                    display: element.style.display,
+                    title: element.getAttribute('title')
+                };
+                element.style.display = 'none';
+                element.removeAttribute('title');
             });
             
+            // Remove any hover states and focus from editable elements
+            const editables = document.querySelectorAll('.editable');
+            editables.forEach(el => {
+                el.blur();
+                el.style.borderStyle = 'none';
+                el.style.background = 'transparent';
+            });
+            
+            // Add enhanced print styles
             const printStyle = document.createElement('style');
-            printStyle.id = 'print-style';
+            printStyle.id = 'enhanced-print-style';
             printStyle.innerHTML = `
                 @media print {
-                    body { margin: 0; padding: 0; background: white !important; font-size: 11px !important; }
+                    * {
+                        -webkit-print-color-adjust: exact !important;
+                        color-adjust: exact !important;
+                    }
+                    
+                    body { 
+                        margin: 0 !important; 
+                        padding: 0 !important; 
+                        background: white !important; 
+                        font-size: 12px !important;
+                        width: 100% !important;
+                    }
+                    
                     .quotation-container { 
                         box-shadow: none !important; 
                         border-radius: 0 !important;
                         margin: 0 !important;
                         max-width: none !important;
+                        width: 100% !important;
                     }
-                    .btn, .remove-btn, .button-container { display: none !important; }
-                    .editable { border: none !important; background: transparent !important; padding: 1px !important; }
-                    .items-table th, .items-table td { font-size: 10px !important; padding: 3px !important; }
-                    .description-cell .editable { font-size: 9px !important; }
-                    .description-list div { font-size: 9px !important; }
-                    @page { margin: 10mm; size: A4; }
+                    
+                    .btn, .remove-btn, .button-container, 
+                    [title], .tooltip, .hover-text {
+                        display: none !important;
+                        visibility: hidden !important;
+                    }
+                    
+                    .editable { 
+                        border: none !important; 
+                        background: transparent !important; 
+                        padding: 1px !important;
+                        box-shadow: none !important;
+                        outline: none !important;
+                    }
+                    
+                    .editable:hover, .editable:focus, .editable:active {
+                        background: transparent !important;
+                        border: none !important;
+                        box-shadow: none !important;
+                        outline: none !important;
+                    }
+                    
+                    .header-section {
+                        background: #f8f9fa !important;
+                        border-bottom: 3px solid #3498db !important;
+                    }
+                    
+                    .quotation-title {
+                        background: #e74c3c !important;
+                        color: white !important;
+                        margin: 0 !important;
+                    }
+                    
+                    .items-table {
+                        border-collapse: collapse !important;
+                        width: 100% !important;
+                    }
+                    
+                    .items-table th {
+                        background: #34495e !important;
+                        color: white !important;
+                        border: 1px solid #333 !important;
+                        font-size: 11px !important;
+                        padding: 6px 4px !important;
+                    }
+                    
+                    .items-table td {
+                        border: 1px solid #333 !important;
+                        font-size: 11px !important;
+                        padding: 6px 4px !important;
+                    }
+                    
+                    .total-row {
+                        background: #ecf0f1 !important;
+                    }
+                    
+                    .total-row td {
+                        border-top: 2px solid #34495e !important;
+                    }
+                    
+                    .payment-terms {
+                        background: #f8f9fa !important;
+                        border: 1px solid #ddd !important;
+                    }
+                    
+                    .customer-project-section {
+                        border: 1px solid #ddd !important;
+                    }
+                    
+                    .customer-info {
+                        border-right: 1px solid #ddd !important;
+                    }
+                    
+                    @page { 
+                        margin: 12mm !important; 
+                        size: A4 !important;
+                    }
                 }
             `;
             document.head.appendChild(printStyle);
             
-            showMessage('📄 กรุณาเลือก "Save as PDF" ในหน้าต่างการพิมพ์', 'info');
-            
+            // Wait a moment for styles to apply
             setTimeout(() => {
+                // Show instruction without tooltip
+                const instruction = document.createElement('div');
+                instruction.id = 'print-instruction';
+                instruction.style.cssText = `
+                    position: fixed;
+                    top: 10px;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: #3498db;
+                    color: white;
+                    padding: 10px 20px;
+                    border-radius: 5px;
+                    z-index: 9999;
+                    font-weight: bold;
+                    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+                `;
+                instruction.textContent = '📄 กรุณาเลือก "Save as PDF" ในหน้าต่างการพิมพ์';
+                document.body.appendChild(instruction);
+                
+                // Trigger print
                 window.print();
                 
+                // Cleanup after print
                 setTimeout(() => {
-                    buttons.forEach((btn, index) => {
-                        btn.style.display = originalDisplay[index];
+                    // Remove instruction
+                    const instructionEl = document.getElementById('print-instruction');
+                    if (instructionEl) instructionEl.remove();
+                    
+                    // Restore all elements
+                    interactiveElements.forEach((element, index) => {
+                        element.style.display = originalStates[index].display;
+                        if (originalStates[index].title) {
+                            element.setAttribute('title', originalStates[index].title);
+                        }
                     });
-                    document.getElementById('print-style')?.remove();
-                }, 1000);
-            }, 500);
+                    
+                    // Restore editable styles
+                    editables.forEach(el => {
+                        el.style.borderStyle = '';
+                        el.style.background = '';
+                    });
+                    
+                    // Remove print styles
+                    const printStyleEl = document.getElementById('enhanced-print-style');
+                    if (printStyleEl) printStyleEl.remove();
+                    
+                }, 2000);
+            }, 300);
         }
         
         // Download as HTML
