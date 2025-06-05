@@ -850,8 +850,8 @@ editables.forEach((el, index) => {
 });
 
 // Add dashes to description items for PDF
-const descItems = document.querySelectorAll('.desc-item');
-descItems.forEach(item => {
+const descItemsForPdf = document.querySelectorAll('.desc-item');
+descItemsForPdf.forEach(item => {
     const text = item.querySelector('.editable');
     if (text && !text.textContent.startsWith('-')) {
         text.textContent = '- ' + text.textContent;
@@ -901,8 +901,8 @@ editables.forEach((el, index) => {
 });
 
 // Remove dashes that were added for PDF
-const descItemsAfter = document.querySelectorAll('.desc-item');
-descItemsAfter.forEach(item => {
+const descItemsAfterPdf = document.querySelectorAll('.desc-item');
+descItemsAfterPdf.forEach(item => {
     const text = item.querySelector('.editable');
     if (text && text.textContent.startsWith('- ')) {
         text.textContent = text.textContent.substring(2);
