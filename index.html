@@ -469,58 +469,92 @@
             calculateTotal();
         });
 
-        // Save as PDF function
-        async function saveAsPDF() {
-            // Hide buttons before generating PDF
+        // Save as PDF function using browser's print dialog
+        function saveAsPDF() {
+            // Hide buttons before printing
+            const buttons = document.querySelectorAll('.add-item-btn, .remove-btn');
+            const originalDisplay = [];
+            buttons.forEach((btn, index) => {
+                originalDisplay[index] = btn.style.display;
+                btn.style.display = 'none';
+            });
+            
+            // Add print styles
+            const printStyle = document.createElement('style');
+            printStyle.id = 'print-style';
+            printStyle.innerHTML = `
+                @media print {
+                    body { margin: 0; padding: 0; background: white !important; }
+                    .quotation-container { 
+                        box-shadow: none !important; 
+                        border-radius: 0 !important;
+                        margin: 0 !important;
+                        max-width: none !important;
+                    }
+                    .add-item-btn, .remove-btn { display: none !important; }
+                    .editable { border: none !important; background: transparent !important; }
+                    .editable:hover { background: transparent !important; }
+                    @page { margin: 15mm; }
+                }
+            `;
+            document.head.appendChild(printStyle);
+            
+            // Show instruction
+            showMessage('📄 กรุณาเลือก "Save as PDF" ในหน้าต่างการพิมพ์ / Please select "Save as PDF" in print dialog', 'info');
+            
+            // Trigger print dialog
+            setTimeout(() => {
+                window.print();
+                
+                // Restore buttons after printing
+                setTimeout(() => {
+                    buttons.forEach((btn, index) => {
+                        btn.style.display = originalDisplay[index];
+                    });
+                    document.getElementById('print-style')?.remove();
+                }, 1000);
+            }, 500);
+        }
+        
+        // Alternative: Download as HTML file
+        function downloadAsHTML() {
+            // Hide buttons
             const buttons = document.querySelectorAll('.add-item-btn, .remove-btn');
             buttons.forEach(btn => btn.style.display = 'none');
             
-            try {
-                // Import html2pdf library
-                const script = document.createElement('script');
-                script.src = 'https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js';
-                document.head.appendChild(script);
-                
-                await new Promise(resolve => {
-                    script.onload = resolve;
-                });
-                
-                // Generate filename with date and quote number
-                const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
-                const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
-                const filename = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`;
-                
-                // PDF options
-                const options = {
-                    margin: 10,
-                    filename: filename,
-                    image: { type: 'jpeg', quality: 0.98 },
-                    html2canvas: { 
-                        scale: 2,
-                        useCORS: true,
-                        letterRendering: true
-                    },
-                    jsPDF: { 
-                        unit: 'mm', 
-                        format: 'a4', 
-                        orientation: 'portrait',
-                        compress: true
-                    }
-                };
-                
-                // Generate and save PDF
-                await html2pdf().set(options).from(document.querySelector('.quotation-container')).save();
-                
-                // Show success message
-                showMessage('✅ บันทึก PDF สำเร็จ! / PDF saved successfully!', 'success');
-                
-            } catch (error) {
-                console.error('Error generating PDF:', error);
-                showMessage('❌ เกิดข้อผิดพลาดในการบันทึก PDF / Error saving PDF', 'error');
-            } finally {
-                // Show buttons again
-                buttons.forEach(btn => btn.style.display = '');
-            }
+            // Get the complete HTML
+            const htmlContent = `<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ใบเสนอราคา</title>
+    <style>${document.querySelector('style').textContent}</style>
+</head>
+<body>
+    ${document.querySelector('.quotation-container').outerHTML}
+</body>
+</html>`;
+            
+            // Create download
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            
+            const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+            const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            a.download = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.html`;
+            a.href = url;
+            
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            
+            // Show buttons again
+            buttons.forEach(btn => btn.style.display = '');
+            
+            showMessage('✅ ดาวน์โหลด HTML สำเร็จ! / HTML downloaded successfully!', 'success');
         }
 
         // Show message function
@@ -535,8 +569,10 @@
                 color: white;
                 font-weight: bold;
                 z-index: 1000;
+                max-width: 300px;
                 animation: slideIn 0.3s ease;
-                background: ${type === 'success' ? '#27ae60' : '#e74c3c'};
+                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             `;
             messageDiv.textContent = message;
             
@@ -548,31 +584,48 @@
                     to { transform: translateX(0); opacity: 1; }
                 }
             `;
-            document.head.appendChild(style);
+            if (!document.querySelector('style[data-animation]')) {
+                style.setAttribute('data-animation', 'true');
+                document.head.appendChild(style);
+            }
             
             document.body.appendChild(messageDiv);
             
-            // Remove message after 3 seconds
+            // Remove message after 4 seconds
             setTimeout(() => {
                 messageDiv.remove();
-                style.remove();
-            }, 3000);
+            }, 4000);
         }
 
-        // Add save PDF button
-        const addSavePDFButton = () => {
-            const saveBtn = document.createElement('button');
-            saveBtn.textContent = '💾 บันทึก PDF / Save PDF';
-            saveBtn.className = 'add-item-btn';
-            saveBtn.onclick = saveAsPDF;
-            saveBtn.style.marginLeft = '10px';
-            saveBtn.style.background = '#27ae60';
-            saveBtn.addEventListener('mouseover', () => saveBtn.style.background = '#219a52');
-            saveBtn.addEventListener('mouseout', () => saveBtn.style.background = '#27ae60');
-            document.querySelector('.add-item-btn').parentNode.appendChild(saveBtn);
+        // Add save buttons
+        const addSaveButtons = () => {
+            const container = document.querySelector('.add-item-btn').parentNode;
+            
+            // PDF Button (using print dialog)
+            const pdfBtn = document.createElement('button');
+            pdfBtn.textContent = '📄 บันทึก PDF / Save PDF';
+            pdfBtn.className = 'add-item-btn';
+            pdfBtn.onclick = saveAsPDF;
+            pdfBtn.style.marginLeft = '10px';
+            pdfBtn.style.background = '#e74c3c';
+            pdfBtn.addEventListener('mouseover', () => pdfBtn.style.background = '#c0392b');
+            pdfBtn.addEventListener('mouseout', () => pdfBtn.style.background = '#e74c3c');
+            
+            // HTML Download Button
+            const htmlBtn = document.createElement('button');
+            htmlBtn.textContent = '💾 ดาวน์โหลด HTML / Download HTML';
+            htmlBtn.className = 'add-item-btn';
+            htmlBtn.onclick = downloadAsHTML;
+            htmlBtn.style.marginLeft = '10px';
+            htmlBtn.style.background = '#27ae60';
+            htmlBtn.addEventListener('mouseover', () => htmlBtn.style.background = '#219a52');
+            htmlBtn.addEventListener('mouseout', () => htmlBtn.style.background = '#27ae60');
+            
+            container.appendChild(pdfBtn);
+            container.appendChild(htmlBtn);
         };
 
-        document.addEventListener('DOMContentLoaded', addSavePDFButton);
+        document.addEventListener('DOMContentLoaded', addSaveButtons);
     </script>
 </body>
 </html>
