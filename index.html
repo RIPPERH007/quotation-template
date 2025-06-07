@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ใบเสนอราคา - Quotation Template</title>
+    
+    <!-- Firebase CDN -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+    
     <style>
         * {
             margin: 0;
@@ -20,6 +26,93 @@
             font-size: 12px;
         }
         
+        /* Login Section */
+        .login-section {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            padding: 30px;
+            text-align: center;
+            display: block;
+        }
+        
+        .login-title {
+            color: #3498db;
+            margin-bottom: 20px;
+            font-size: 28px;
+        }
+        
+        .login-form {
+            max-width: 400px;
+            margin: 0 auto;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+        
+        .form-label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+        
+        .auth-tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+        
+        .auth-tab {
+            flex: 1;
+            padding: 10px;
+            background: #f8f9fa;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-tab.active {
+            background: #3498db;
+            color: white;
+        }
+        
+        .user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .user-email {
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
         /* Landing Page Styles */
         .landing-page {
             max-width: 1000px;
@@ -28,7 +121,7 @@
             border-radius: 12px;
             box-shadow: 0 0 20px rgba(0,0,0,0.1);
             overflow: hidden;
-            display: block;
+            display: none;
         }
         
         .landing-header {
@@ -157,6 +250,12 @@
             color: #7f8c8d;
             padding: 40px;
             font-style: italic;
+        }
+        
+        .loading {
+            text-align: center;
+            color: #3498db;
+            padding: 20px;
         }
         
         /* Quotation Page Styles */
@@ -464,6 +563,12 @@
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
         }
         
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
         .btn-primary {
             background: #3498db;
         }
@@ -478,6 +583,10 @@
         
         .btn-secondary {
             background: #6c757d;
+        }
+        
+        .btn-warning {
+            background: #f39c12;
         }
         
         .btn-small {
@@ -514,6 +623,33 @@
         .back-to-home:hover {
             background: #5a6268;
             transform: translateY(-1px);
+        }
+        
+        .status-indicator {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            background: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-size: 12px;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .status-indicator.offline {
+            background: #e74c3c;
+        }
+        
+        .firebase-error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c00;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            text-align: center;
         }
         
         @media print {
@@ -672,14 +808,64 @@
     </style>
 </head>
 <body>
+    <!-- Status Indicator -->
+    <div class="status-indicator" id="statusIndicator">🔥 เชื่อมต่อ Firebase สำเร็จ</div>
+
+    <!-- Login Section -->
+    <div class="login-section" id="loginSection">
+        <div class="login-title">🔐 เข้าสู่ระบบ</div>
+        
+        <div class="user-info" id="userInfo" style="display: none;">
+            <div>
+                <div class="user-email" id="userEmail"></div>
+                <div style="font-size: 12px; color: #666;">เข้าสู่ระบบแล้ว</div>
+            </div>
+            <button class="btn btn-secondary btn-small" onclick="signOut()">ออกจากระบบ</button>
+        </div>
+        
+        <div class="login-form" id="loginForm">
+            <div class="auth-tabs">
+                <button class="auth-tab active" onclick="switchAuthTab('login')">เข้าสู่ระบบ</button>
+                <button class="auth-tab" onclick="switchAuthTab('register')">สมัครสมาชิก</button>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">อีเมล:</label>
+                <input type="email" class="form-input" id="email" placeholder="your@email.com">
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">รหัสผ่าน:</label>
+                <input type="password" class="form-input" id="password" placeholder="รหัสผ่าน">
+            </div>
+            
+            <div class="button-container">
+                <button class="btn btn-primary" id="authSubmitBtn" onclick="handleAuth()">เข้าสู่ระบบ</button>
+                <button class="btn btn-success" onclick="signInWithGoogle()">🚀 เข้าสู่ระบบด้วย Google</button>
+            </div>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button class="btn btn-secondary btn-small" onclick="continueToApp()">⏭️ ข้ามการเข้าสู่ระบบ (ใช้ localStorage)</button>
+        </div>
+    </div>
+
     <!-- Landing Page -->
     <div class="landing-page" id="landingPage">
         <div class="landing-header">
             <div class="landing-title">📋 ระบบใบเสนอราคา</div>
-            <div class="landing-subtitle">Quotation Management System</div>
+            <div class="landing-subtitle">Quotation Management System with Firebase</div>
         </div>
         
         <div class="landing-content">
+            <div class="user-info" id="landingUserInfo" style="display: none;">
+                <div>
+                    <div class="user-email" id="landingUserEmail"></div>
+                    <div style="font-size: 12px; color: #666;">เข้าสู่ระบบแล้ว</div>
+                </div>
+                <button class="btn btn-secondary btn-small" onclick="signOut()">ออกจากระบบ</button>
+            </div>
+            
             <div class="action-cards">
                 <div class="action-card" onclick="createNewQuotation()">
                     <div class="action-card-icon">📝</div>
@@ -700,7 +886,7 @@
                     <span id="historyCount" style="font-size: 14px; color: #7f8c8d;">(0 รายการ)</span>
                 </div>
                 <div class="history-list" id="historyList">
-                    <div class="no-history">ยังไม่มีประวัติใบเสนอราคาที่บันทึกไว้</div>
+                    <div class="loading">🔄 กำลังโหลดข้อมูล...</div>
                 </div>
             </div>
         </div>
@@ -738,10 +924,6 @@
             <div class="customer-project-section">
                 <div class="customer-info">
                     <div class="section-title">ข้อมูลลูกค้า / Customer Information</div>
-                    <div class="info-row">
-                        <span class="info-label">ชื่อบริษัท / Company:</span>
-                        <div class="editable" contenteditable="true" id="companyName">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div>
-                    </div>
                     <div class="info-row">
                         <span class="info-label">ที่อยู่ / Address:</span>
                         <div class="editable" contenteditable="true" id="companyAddress">225/708 หมู่ที่ 11 ตำบลบ้านแหวน
@@ -807,9 +989,9 @@
             
             <div class="button-container">
                 <button class="btn btn-primary" onclick="addRow()">➕ เพิ่มรายการ</button>
-                <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึก PDF</button>
-                <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button>
-                <button class="btn btn-secondary" onclick="saveToHistory()">💾 บันทึกประวัติ</button>
+                <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึกและดาวน์โหลดPDF</button>
+                <!-- <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button> -->
+                <button class="btn btn-secondary" onclick="saveToHistory()" id="saveBtn">💾 บันทึก</button>
             </div>
             
             <div class="payment-terms">
@@ -838,14 +1020,226 @@
     <script>
         let itemCounter = 1;
         let currentEditId = null;
+        let isFirebaseInitialized = false;
+        let useFirebase = false;
+        let currentUser = null;
+        let db = null;
+        let auth = null;
+        let isAuthMode = 'login';
 
-        // ===== LANDING PAGE FUNCTIONS =====
+        // ===== FIREBASE FUNCTIONS =====
         
-        function createNewQuotation() {
-            currentEditId = null;
-            clearForm();
-            generateNewQuoteNumber();
-            showQuotationForm();
+        function initializeFirebase() {
+            // *** ต้องแทนที่ด้วย Firebase Config จริงจาก Firebase Console ***
+            // วิธีหา Config: Firebase Console > Project Settings > General > Your apps > Config
+            
+             const firebaseConfig = {
+                apiKey: "AIzaSyBbuIekW1A-z-7xD-HwQ4Hintr92YkHeRo",
+                authDomain: "templat-po.firebaseapp.com",
+                projectId: "templat-po",
+                storageBucket: "templat-po.firebasestorage.app",
+                messagingSenderId: "181460378350",
+                appId: "1:181460378350:web:e6f1e5cad3341348c0c9ff",
+                measurementId: "G-R14YK816D2"
+            };
+
+            // ตรวจสอบว่ามี API Key จริงหรือไม่
+            if (firebaseConfig.apiKey === "YOUR_REAL_API_KEY_HERE") {
+                console.warn('⚠️ กรุณาใส่ Firebase Config จริงในโค้ด');
+                showStatusIndicator('⚠️ ต้องตั้งค่า Firebase Config ก่อน', 'warning');
+                
+                // ใช้ localStorage แทน
+                useFirebase = false;
+                isFirebaseInitialized = false;
+                showLandingPage();
+                return;
+            }
+
+            try {
+                // ตรวจสอบว่ามี Firebase app อยู่แล้วหรือไม่
+                if (firebase.apps.length === 0) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                
+                auth = firebase.auth();
+                db = firebase.firestore();
+                
+                // Test connection
+                auth.onAuthStateChanged((user) => {
+                    currentUser = user;
+                    updateUserInfo();
+                    if (user) {
+                        showLandingPage();
+                    }
+                });
+
+                isFirebaseInitialized = true;
+                useFirebase = true;
+                
+                showStatusIndicator('🔥 เชื่อมต่อ Firebase สำเร็จ', 'success');
+                
+            } catch (error) {
+                console.error('Firebase initialization error:', error);
+                showStatusIndicator(`❌ Firebase Error: ${error.message}`, 'error');
+                
+                // Fallback to localStorage mode
+                useFirebase = false;
+                isFirebaseInitialized = false;
+                showLandingPage();
+                showStatusIndicator('💾 ใช้งานแบบ Local Storage (Firebase ล้มเหลว)', 'info');
+            }
+        }
+
+        function useLocalStorage() {
+            useFirebase = false;
+            showLandingPage();
+            showStatusIndicator('💾 ใช้งานแบบ Local Storage', 'info');
+        }
+
+        // ===== AUTHENTICATION FUNCTIONS =====
+        
+        function switchAuthTab(mode) {
+            isAuthMode = mode;
+            const tabs = document.querySelectorAll('.auth-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            const submitBtn = document.getElementById('authSubmitBtn');
+            if (mode === 'login') {
+                submitBtn.textContent = 'เข้าสู่ระบบ';
+            } else {
+                submitBtn.textContent = 'สมัครสมาชิก';
+            }
+        }
+
+        async function handleAuth() {
+            if (!isFirebaseInitialized) {
+                showMessage('❌ Firebase ยังไม่ได้เชื่อมต่อ', 'error');
+                return;
+            }
+
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value.trim();
+
+            if (!email || !password) {
+                showMessage('❌ กรุณากรอกอีเมลและรหัสผ่าน', 'error');
+                return;
+            }
+
+            try {
+                const submitBtn = document.getElementById('authSubmitBtn');
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'กำลังดำเนินการ...';
+
+                if (isAuthMode === 'login') {
+                    await auth.signInWithEmailAndPassword(email, password);
+                    showMessage('✅ เข้าสู่ระบบสำเร็จ!', 'success');
+                } else {
+                    await auth.createUserWithEmailAndPassword(email, password);
+                    showMessage('✅ สมัครสมาชิกสำเร็จ!', 'success');
+                }
+
+                document.getElementById('email').value = '';
+                document.getElementById('password').value = '';
+                showLandingPage();
+
+            } catch (error) {
+                console.error('Auth error:', error);
+                let errorMessage = 'เกิดข้อผิดพลาด: ';
+                
+                switch (error.code) {
+                    case 'auth/user-not-found':
+                        errorMessage += 'ไม่พบผู้ใช้นี้';
+                        break;
+                    case 'auth/wrong-password':
+                        errorMessage += 'รหัสผ่านไม่ถูกต้อง';
+                        break;
+                    case 'auth/email-already-in-use':
+                        errorMessage += 'อีเมลนี้ถูกใช้งานแล้ว';
+                        break;
+                    case 'auth/weak-password':
+                        errorMessage += 'รหัสผ่านต้องมีอย่างน้อย 6 ตัวอักษร';
+                        break;
+                    case 'auth/invalid-email':
+                        errorMessage += 'รูปแบบอีเมลไม่ถูกต้อง';
+                        break;
+                    default:
+                        errorMessage += error.message;
+                }
+                
+                showMessage('❌ ' + errorMessage, 'error');
+            } finally {
+                const submitBtn = document.getElementById('authSubmitBtn');
+                submitBtn.disabled = false;
+                submitBtn.textContent = isAuthMode === 'login' ? 'เข้าสู่ระบบ' : 'สมัครสมาชิก';
+            }
+        }
+
+        async function signInWithGoogle() {
+            if (!isFirebaseInitialized) {
+                showMessage('❌ Firebase ยังไม่ได้เชื่อมต่อ', 'error');
+                return;
+            }
+
+            try {
+                const provider = new firebase.auth.GoogleAuthProvider();
+                await auth.signInWithPopup(provider);
+                showMessage('✅ เข้าสู่ระบบด้วย Google สำเร็จ!', 'success');
+                showLandingPage();
+            } catch (error) {
+                console.error('Google sign in error:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการเข้าสู่ระบบด้วย Google', 'error');
+            }
+        }
+
+        async function signOut() {
+            if (auth && currentUser) {
+                try {
+                    await auth.signOut();
+                    showMessage('✅ ออกจากระบบสำเร็จ', 'success');
+                    showLoginSection();
+                } catch (error) {
+                    console.error('Sign out error:', error);
+                    showMessage('❌ เกิดข้อผิดพลาดในการออกจากระบบ', 'error');
+                }
+            }
+        }
+
+        function continueToApp() {
+            useFirebase = false;
+            showLandingPage();
+            showStatusIndicator('💾 ใช้งานแบบ Local Storage', 'info');
+        }
+
+        function updateUserInfo() {
+            const userInfoElements = document.querySelectorAll('#userInfo, #landingUserInfo');
+            const userEmailElements = document.querySelectorAll('#userEmail, #landingUserEmail');
+            
+            if (currentUser) {
+                userInfoElements.forEach(el => el.style.display = 'flex');
+                userEmailElements.forEach(el => el.textContent = currentUser.email);
+                document.getElementById('loginForm').style.display = 'none';
+            } else {
+                userInfoElements.forEach(el => el.style.display = 'none');
+                userEmailElements.forEach(el => el.textContent = '');
+                document.getElementById('loginForm').style.display = 'block';
+            }
+        }
+
+        // ===== UI MANAGEMENT FUNCTIONS =====
+        
+        function showLoginSection() {
+            document.getElementById('loginSection').style.display = 'block';
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('quotationContainer').style.display = 'none';
+        }
+
+        function showLandingPage() {
+            document.getElementById('loginSection').style.display = 'none';
+            document.getElementById('landingPage').style.display = 'block';
+            document.getElementById('quotationContainer').style.display = 'none';
+            document.getElementById('historySection').style.display = 'none';
+            loadHistory();
         }
 
         function showQuotationForm() {
@@ -853,11 +1247,322 @@
             document.getElementById('quotationContainer').style.display = 'block';
         }
 
+        function showStatusIndicator(message, type) {
+            const indicator = document.getElementById('statusIndicator');
+            indicator.textContent = message;
+            indicator.className = 'status-indicator';
+            if (type === 'error') indicator.classList.add('offline');
+            indicator.style.display = 'block';
+            
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 4000);
+        }
+
+        // ===== DATA STORAGE FUNCTIONS =====
+        
+        async function saveToHistory() {
+            const quotationData = gatherQuotationData();
+            
+            if (!quotationData.projectName.trim()) {
+                showMessage('⚠️ กรุณากรอกชื่อโครงการก่อนบันทึก', 'error');
+                return;
+            }
+
+            try {
+                const saveBtn = document.getElementById('saveBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = true;
+                    saveBtn.textContent = '💾 กำลังบันทึก...';
+                }
+
+                const timestamp = new Date().toISOString();
+                const historyItem = {
+                    id: currentEditId || timestamp,
+                    ...quotationData,
+                    savedAt: timestamp,
+                    lastModified: timestamp,
+                    userId: currentUser ? currentUser.uid : 'local'
+                };
+
+                if (useFirebase && isFirebaseInitialized && currentUser) {
+                    // บันทึกไป Firebase (หลัก)
+                    try {
+                        const docRef = db.collection('quotations').doc(historyItem.id);
+                        await docRef.set(historyItem);
+                        showMessage('✅ บันทึกไปยัง Firebase สำเร็จ!', 'success');
+                        
+                        // Backup ไป localStorage ด้วย
+                        const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                        if (currentEditId) {
+                            const index = history.findIndex(item => item.id === currentEditId);
+                            if (index !== -1) {
+                                history[index] = historyItem;
+                            } else {
+                                history.unshift(historyItem);
+                            }
+                        } else {
+                            history.unshift(historyItem);
+                        }
+                        localStorage.setItem('quotationHistory', JSON.stringify(history));
+                        
+                    } catch (firebaseError) {
+                        console.error('Firebase save error:', firebaseError);
+                        
+                        let errorMessage = 'Firebase ล้มเหลว: ';
+                        if (firebaseError.code === 'permission-denied') {
+                            errorMessage += 'ไม่มีสิทธิ์เขียนข้อมูล กรุณาตรวจสอบ Firestore Rules';
+                        } else if (firebaseError.code === 'unauthenticated') {
+                            errorMessage += 'กรุณาเข้าสู่ระบบใหม่';
+                        } else {
+                            errorMessage += firebaseError.message;
+                        }
+                        
+                        // ใช้ localStorage แทนเมื่อ Firebase ล้มเหลว
+                        const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                        if (currentEditId) {
+                            const index = history.findIndex(item => item.id === currentEditId);
+                            if (index !== -1) {
+                                history[index] = historyItem;
+                            } else {
+                                history.unshift(historyItem);
+                            }
+                        } else {
+                            history.unshift(historyItem);
+                        }
+                        localStorage.setItem('quotationHistory', JSON.stringify(history));
+                        showMessage('⚠️ บันทึกในเครื่องแล้ว (' + errorMessage + ')', 'warning');
+                    }
+                } else {
+                    // ใช้ localStorage เมื่อไม่ได้ login
+                    const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                    if (currentEditId) {
+                        const index = history.findIndex(item => item.id === currentEditId);
+                        if (index !== -1) {
+                            history[index] = historyItem;
+                        } else {
+                            history.unshift(historyItem);
+                        }
+                    } else {
+                        history.unshift(historyItem);
+                    }
+                    localStorage.setItem('quotationHistory', JSON.stringify(history));
+                    showMessage('✅ บันทึกในเครื่องสำเร็จ!', 'success');
+                }
+
+                currentEditId = historyItem.id;
+                loadHistory();
+
+            } catch (error) {
+                console.error('Save error:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการบันทึก: ' + error.message, 'error');
+            } finally {
+                const saveBtn = document.getElementById('saveBtn');
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = '💾 บันทึกประวัติ';
+                }
+            }
+        }
+
+        async function loadHistory() {
+            const historyList = document.getElementById('historyList');
+            const historyCount = document.getElementById('historyCount');
+            
+            if (!historyList || !historyCount) {
+                console.warn('History elements not found');
+                return;
+            }
+            
+            try {
+                historyList.innerHTML = '<div class="loading">🔄 กำลังโหลดข้อมูล...</div>';
+
+                let history = [];
+
+                if (useFirebase && isFirebaseInitialized && currentUser) {
+                    try {
+                        // โหลดจาก Firebase
+                        const snapshot = await db.collection('quotations')
+                            .where('userId', '==', currentUser.uid)
+                            .orderBy('savedAt', 'desc')
+                            .get();
+                        
+                        history = snapshot.docs.map(doc => doc.data());
+                        
+                        // Sync กับ localStorage
+                        localStorage.setItem('quotationHistory', JSON.stringify(history));
+                        
+                    } catch (firebaseError) {
+                        console.warn('Firebase load failed, using localStorage:', firebaseError);
+                        // ถ้า Firebase ล้มเหลว ใช้ localStorage
+                        history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                    }
+                } else {
+                    // โหลดจาก localStorage เมื่อไม่ได้ login
+                    history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                }
+                
+                historyCount.textContent = `(${history.length} รายการ)`;
+
+                if (history.length === 0) {
+                    historyList.innerHTML = '<div class="no-history">ยังไม่มีประวัติใบเสนอราคาที่บันทึกไว้</div>';
+                    return;
+                }
+
+                historyList.innerHTML = history.map(item => `
+                    <div class="history-item">
+                        <div class="history-info">
+                            <div class="history-project">${item.projectName || 'ไม่มีชื่อโครงการ'}</div>
+                            <div class="history-details">
+                                <span>📋 ${item.quoteNumber || 'ไม่มีเลขที่'}</span>
+                                <span>🏢 ${item.companyName || 'ไม่ระบุบริษัท'}</span>
+                                <span>💰 ${item.totalAmount || '0.00'} บาท</span>
+                                <span>📅 ${item.savedAt ? new Date(item.savedAt).toLocaleDateString('th-TH', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric',
+                                    hour: '2-digit',
+                                    minute: '2-digit'
+                                }) : 'ไม่ระบุวันที่'}</span>
+                                ${(useFirebase && currentUser) ? '<span>🔥 Firebase</span>' : '<span>💾 Local</span>'}
+                            </div>
+                        </div>
+                        <div class="history-actions">
+                            <button class="btn btn-primary btn-small" onclick="editQuotation('${item.id}')">✏️ แก้ไข</button>
+                            <button class="btn btn-danger btn-small" onclick="deleteHistoryItem('${item.id}')">🗑️ ลบ</button>
+                            <button class="btn btn-success btn-small" onclick="duplicateQuotation('${item.id}')">📋 คัดลอก</button>
+                        </div>
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error('Load history error:', error);
+                historyList.innerHTML = '<div class="firebase-error">❌ เกิดข้อผิดพลาดในการโหลดข้อมูล: ' + error.message + '</div>';
+            }
+        }
+
+        async function deleteHistoryItem(id) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบใบเสนอราคานี้?')) {
+                return;
+            }
+
+            try {
+                if (useFirebase && isFirebaseInitialized && currentUser) {
+                    try {
+                        // ลบจาก Firebase
+                        await db.collection('quotations').doc(id).delete();
+                        showMessage('🗑️ ลบจาก Firebase สำเร็จ!', 'success');
+                    } catch (firebaseError) {
+                        console.warn('Firebase delete failed:', firebaseError);
+                        showMessage('⚠️ ลบจาก Firebase ล้มเหลว แต่จะลบในเครื่อง', 'warning');
+                    }
+                }
+                
+                // ลบจาก localStorage ด้วย
+                const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                const filteredHistory = history.filter(item => item.id !== id);
+                localStorage.setItem('quotationHistory', JSON.stringify(filteredHistory));
+                
+                if (!useFirebase || !currentUser) {
+                    showMessage('🗑️ ลบใบเสนอราคาสำเร็จ!', 'success');
+                }
+
+                loadHistory();
+
+            } catch (error) {
+                console.error('Delete error:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการลบ: ' + error.message, 'error');
+            }
+        }
+
+        async function editQuotation(id) {
+            try {
+                let item = null;
+
+                if (useFirebase && isFirebaseInitialized && currentUser) {
+                    try {
+                        // โหลดจาก Firebase
+                        const doc = await db.collection('quotations').doc(id).get();
+                        if (doc.exists) {
+                            item = doc.data();
+                        }
+                    } catch (firebaseError) {
+                        console.warn('Firebase load failed, using localStorage:', firebaseError);
+                    }
+                }
+                
+                if (!item) {
+                    // ถ้าไม่พบใน Firebase หรือ Firebase ล้มเหลว ให้โหลดจาก localStorage
+                    const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                    item = history.find(h => h.id === id);
+                }
+
+                if (!item) {
+                    showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
+                    return;
+                }
+
+                currentEditId = id;
+                loadQuotationData(item);
+                showQuotationForm();
+                showMessage('✏️ โหลดใบเสนอราคาสำเร็จ!', 'success');
+
+            } catch (error) {
+                console.error('Edit error:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการโหลด: ' + error.message, 'error');
+            }
+        }
+
+        async function duplicateQuotation(id) {
+            try {
+                let item = null;
+
+                if (useFirebase && isFirebaseInitialized && currentUser) {
+                    try {
+                        // โหลดจาก Firebase
+                        const doc = await db.collection('quotations').doc(id).get();
+                        if (doc.exists) {
+                            item = doc.data();
+                        }
+                    } catch (firebaseError) {
+                        console.warn('Firebase load failed, using localStorage:', firebaseError);
+                    }
+                }
+                
+                if (!item) {
+                    // ถ้าไม่พบใน Firebase หรือ Firebase ล้มเหลว ให้โหลดจาก localStorage
+                    const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                    item = history.find(h => h.id === id);
+                }
+
+                if (!item) {
+                    showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
+                    return;
+                }
+
+                currentEditId = null;
+                loadQuotationData(item);
+                generateNewQuoteNumber(); // Generate new quote number for duplicate
+                showQuotationForm();
+                showMessage('📋 คัดลอกใบเสนอราคาสำเร็จ! อย่าลืมบันทึกใหม่', 'success');
+
+            } catch (error) {
+                console.error('Duplicate error:', error);
+                showMessage('❌ เกิดข้อผิดพลาดในการคัดลอก: ' + error.message, 'error');
+            }
+        }
+
+        // ===== LANDING PAGE FUNCTIONS =====
+        
+        function createNewQuotation() {
+            currentEditId = null;
+            showQuotationForm(); // แสดงฟอร์มก่อน
+            clearForm(); // แล้วค่อย clear form
+            generateNewQuoteNumber();
+        }
+
         function backToHome() {
-            document.getElementById('quotationContainer').style.display = 'none';
-            document.getElementById('landingPage').style.display = 'block';
-            document.getElementById('historySection').style.display = 'none';
-            loadHistory();
+            showLandingPage();
         }
 
         function toggleHistorySection() {
@@ -871,49 +1576,70 @@
         }
 
         function clearForm() {
-            // Reset quote info
-            document.getElementById('quoteNumber').textContent = '';
-            document.getElementById('quoteDate').textContent = new Date().toLocaleDateString('th-TH');
+            // Reset quote info - with null checks
+            const quoteNumber = document.getElementById('quoteNumber');
+            if (quoteNumber) quoteNumber.textContent = '';
             
-            // Reset customer info
-            document.getElementById('companyName').textContent = '';
-            document.getElementById('companyAddress').textContent = '';
-            document.getElementById('taxId').textContent = '';
+            const quoteDate = document.getElementById('quoteDate');
+            if (quoteDate) quoteDate.textContent = new Date().toLocaleDateString('th-TH');
             
-            // Reset project info
-            document.getElementById('projectName').textContent = '';
-            document.getElementById('timeline').textContent = '';
+            // Reset customer info - with null checks
+            const companyName = document.getElementById('companyName');
+            if (companyName) companyName.textContent = '';
             
-            // Reset payment terms
-            document.getElementById('paymentTerms').textContent = '';
+            const companyAddress = document.getElementById('companyAddress');
+            if (companyAddress) companyAddress.textContent = '';
             
-            // Reset signatures
-            document.getElementById('customerSignature').textContent = '';
-            document.getElementById('customerDate').textContent = 'วันที่ / Date: ................................';
-            document.getElementById('vendorSignature').textContent = '(ผู้เสนอราคา / Vendor)';
-            document.getElementById('vendorDate').textContent = 'วันที่ / Date: ................................';
+            const taxId = document.getElementById('taxId');
+            if (taxId) taxId.textContent = '';
             
-            // Clear items table
+            // Reset project info - with null checks
+            const projectName = document.getElementById('projectName');
+            if (projectName) projectName.textContent = '';
+            
+            const timeline = document.getElementById('timeline');
+            if (timeline) timeline.textContent = '';
+            
+            // Reset payment terms - with null checks
+            const paymentTerms = document.getElementById('paymentTerms');
+            if (paymentTerms) paymentTerms.textContent = '';
+            
+            // Reset signatures - with null checks
+            const customerSignature = document.getElementById('customerSignature');
+            if (customerSignature) customerSignature.textContent = '';
+            
+            const customerDate = document.getElementById('customerDate');
+            if (customerDate) customerDate.textContent = 'วันที่ / Date: ................................';
+            
+            const vendorSignature = document.getElementById('vendorSignature');
+            if (vendorSignature) vendorSignature.textContent = '(ผู้เสนอราคา / Vendor)';
+            
+            const vendorDate = document.getElementById('vendorDate');
+            if (vendorDate) vendorDate.textContent = 'วันที่ / Date: ................................';
+            
+            // Clear items table - with null check
             const tbody = document.getElementById('itemsBody');
-            tbody.innerHTML = `
-                <tr>
-                    <td>1</td>
-                    <td class="description-cell">
-                        <div class="main-description">
-                            <div class="editable" contenteditable="true">รายละเอียดงาน</div>
-                        </div>
-                        <div class="sub-description">
-                            <div class="editable" contenteditable="true">รายละเอียดย่อย 1</div>
-                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
-                        </div>
-                        <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
-                    </td>
-                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
-                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
-                    <td class="amount-cell">0.00</td>
-                    <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
-                </tr>
-            `;
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td>1</td>
+                        <td class="description-cell">
+                            <div class="main-description">
+                                <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+                            </div>
+                            <div class="sub-description">
+                                <div class="editable" contenteditable="true">รายละเอียดย่อย 1</div>
+                                <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                            </div>
+                            <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
+                        </td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
+                        <td class="amount-cell">0.00</td>
+                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                    </tr>
+                `;
+            }
             
             itemCounter = 1;
             calculateTotal();
@@ -926,192 +1652,106 @@
             const day = String(today.getDate()).padStart(2, '0');
             
             // Get existing quotes from today to generate sequential number
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
             const todayPrefix = `QT-${year}${month}${day}`;
-            const todayQuotes = history.filter(item => item.quoteNumber.startsWith(todayPrefix));
-            const nextNumber = String(todayQuotes.length + 1).padStart(3, '0');
+            const nextNumber = String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
             
             const newQuoteNumber = `${todayPrefix}-${nextNumber}`;
             document.getElementById('quoteNumber').textContent = newQuoteNumber;
         }
 
-        // ===== HISTORY FUNCTIONS =====
-        
-        function saveToHistory() {
-            const quotationData = gatherQuotationData();
-            
-            if (!quotationData.projectName.trim()) {
-                showMessage('⚠️ กรุณากรอกชื่อโครงการก่อนบันทึก', 'error');
-                return;
-            }
-
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
-            const timestamp = new Date().toISOString();
-            
-            const historyItem = {
-                id: currentEditId || timestamp,
-                ...quotationData,
-                savedAt: timestamp,
-                lastModified: timestamp
-            };
-
-            if (currentEditId) {
-                // Update existing item
-                const index = history.findIndex(item => item.id === currentEditId);
-                if (index !== -1) {
-                    history[index] = historyItem;
-                    showMessage('✅ อัพเดทประวัติสำเร็จ!', 'success');
-                }
-            } else {
-                // Add new item
-                history.unshift(historyItem);
-                currentEditId = historyItem.id;
-                showMessage('✅ บันทึกประวัติสำเร็จ!', 'success');
-            }
-
-            localStorage.setItem('quotationHistory', JSON.stringify(history));
-            loadHistory();
-        }
-
         function gatherQuotationData() {
-            // Gather all form data
+            // Gather all form data with null checks
             const data = {
-                quoteNumber: document.getElementById('quoteNumber').textContent,
-                quoteDate: document.getElementById('quoteDate').textContent,
-                companyName: document.getElementById('companyName').textContent,
-                companyAddress: document.getElementById('companyAddress').textContent,
-                taxId: document.getElementById('taxId').textContent,
-                projectName: document.getElementById('projectName').textContent,
-                timeline: document.getElementById('timeline').textContent,
-                paymentTerms: document.getElementById('paymentTerms').textContent,
-                customerSignature: document.getElementById('customerSignature').textContent,
-                customerDate: document.getElementById('customerDate').textContent,
-                vendorSignature: document.getElementById('vendorSignature').textContent,
-                vendorDate: document.getElementById('vendorDate').textContent,
-                totalAmount: document.getElementById('totalAmount').textContent,
+                quoteNumber: document.getElementById('quoteNumber')?.textContent || '',
+                quoteDate: document.getElementById('quoteDate')?.textContent || '',
+                companyName: document.getElementById('companyName')?.textContent || '',
+                companyAddress: document.getElementById('companyAddress')?.textContent || '',
+                taxId: document.getElementById('taxId')?.textContent || '',
+                projectName: document.getElementById('projectName')?.textContent || '',
+                timeline: document.getElementById('timeline')?.textContent || '',
+                paymentTerms: document.getElementById('paymentTerms')?.textContent || '',
+                customerSignature: document.getElementById('customerSignature')?.textContent || '',
+                customerDate: document.getElementById('customerDate')?.textContent || '',
+                vendorSignature: document.getElementById('vendorSignature')?.textContent || '',
+                vendorDate: document.getElementById('vendorDate')?.textContent || '',
+                totalAmount: document.getElementById('totalAmount')?.textContent || '0.00',
                 items: []
             };
 
-            // Gather items data
+            // Gather items data with null checks
             const rows = document.querySelectorAll('#itemsBody tr');
             rows.forEach(row => {
                 const cells = row.cells;
-                const mainDesc = cells[1].querySelector('.main-description .editable').textContent;
-                const subDescs = Array.from(cells[1].querySelectorAll('.sub-description .editable')).map(el => el.textContent);
-                const qty = cells[2].querySelector('.editable').textContent;
-                const unitPrice = cells[3].querySelector('.editable').textContent;
-                const amount = cells[4].textContent;
+                if (cells && cells.length >= 5) {
+                    const mainDescEl = cells[1]?.querySelector('.main-description .editable');
+                    const subDescEls = cells[1]?.querySelectorAll('.sub-description .editable');
+                    const qtyEl = cells[2]?.querySelector('.editable');
+                    const unitPriceEl = cells[3]?.querySelector('.editable');
+                    
+                    const mainDesc = mainDescEl?.textContent || '';
+                    const subDescs = subDescEls ? Array.from(subDescEls).map(el => el.textContent || '') : [];
+                    const qty = qtyEl?.textContent || '0';
+                    const unitPrice = unitPriceEl?.textContent || '0.00';
+                    const amount = cells[4]?.textContent || '0.00';
 
-                data.items.push({
-                    mainDescription: mainDesc,
-                    subDescriptions: subDescs,
-                    quantity: qty,
-                    unitPrice: unitPrice,
-                    amount: amount
-                });
+                    data.items.push({
+                        mainDescription: mainDesc,
+                        subDescriptions: subDescs,
+                        quantity: qty,
+                        unitPrice: unitPrice,
+                        amount: amount
+                    });
+                }
             });
 
             return data;
         }
 
-        function loadHistory() {
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
-            const historyList = document.getElementById('historyList');
-            const historyCount = document.getElementById('historyCount');
-            
-            historyCount.textContent = `(${history.length} รายการ)`;
-
-            if (history.length === 0) {
-                historyList.innerHTML = '<div class="no-history">ยังไม่มีประวัติใบเสนอราคาที่บันทึกไว้</div>';
-                return;
-            }
-
-            historyList.innerHTML = history.map(item => `
-                <div class="history-item">
-                    <div class="history-info">
-                        <div class="history-project">${item.projectName || 'ไม่มีชื่อโครงการ'}</div>
-                        <div class="history-details">
-                            <span>📋 ${item.quoteNumber}</span>
-                            <span>🏢 ${item.companyName || 'ไม่ระบุบริษัท'}</span>
-                            <span>💰 ${item.totalAmount} บาท</span>
-                            <span>📅 ${new Date(item.savedAt).toLocaleDateString('th-TH', {
-                                year: 'numeric',
-                                month: 'short',
-                                day: 'numeric',
-                                hour: '2-digit',
-                                minute: '2-digit'
-                            })}</span>
-                        </div>
-                    </div>
-                    <div class="history-actions">
-                        <button class="btn btn-primary btn-small" onclick="editQuotation('${item.id}')">✏️ แก้ไข</button>
-                        <button class="btn btn-danger btn-small" onclick="deleteHistoryItem('${item.id}')">🗑️ ลบ</button>
-                        <button class="btn btn-success btn-small" onclick="duplicateQuotation('${item.id}')">📋 คัดลอก</button>
-                    </div>
-                </div>
-            `).join('');
-        }
-
-        function editQuotation(id) {
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
-            const item = history.find(h => h.id === id);
-            
-            if (!item) {
-                showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
-                return;
-            }
-
-            currentEditId = id;
-            loadQuotationData(item);
-            showQuotationForm();
-        }
-
-        function duplicateQuotation(id) {
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
-            const item = history.find(h => h.id === id);
-            
-            if (!item) {
-                showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
-                return;
-            }
-
-            currentEditId = null;
-            loadQuotationData(item);
-            generateNewQuoteNumber(); // Generate new quote number for duplicate
-            showQuotationForm();
-            showMessage('📋 คัดลอกใบเสนอราคาสำเร็จ! อย่าลืมบันทึกใหม่', 'success');
-        }
-
-        function deleteHistoryItem(id) {
-            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบใบเสนอราคานี้?')) {
-                return;
-            }
-
-            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
-            const filteredHistory = history.filter(item => item.id !== id);
-            
-            localStorage.setItem('quotationHistory', JSON.stringify(filteredHistory));
-            loadHistory();
-            showMessage('🗑️ ลบใบเสนอราคาสำเร็จ!', 'success');
-        }
-
         function loadQuotationData(data) {
-            // Load basic info
-            document.getElementById('quoteNumber').textContent = data.quoteNumber || '';
-            document.getElementById('quoteDate').textContent = data.quoteDate || '';
-            document.getElementById('companyName').textContent = data.companyName || '';
-            document.getElementById('companyAddress').textContent = data.companyAddress || '';
-            document.getElementById('taxId').textContent = data.taxId || '';
-            document.getElementById('projectName').textContent = data.projectName || '';
-            document.getElementById('timeline').textContent = data.timeline || '';
-            document.getElementById('paymentTerms').textContent = data.paymentTerms || '';
-            document.getElementById('customerSignature').textContent = data.customerSignature || '';
-            document.getElementById('customerDate').textContent = data.customerDate || '';
-            document.getElementById('vendorSignature').textContent = data.vendorSignature || '';
-            document.getElementById('vendorDate').textContent = data.vendorDate || '';
+            // Load basic info with null checks
+            const quoteNumber = document.getElementById('quoteNumber');
+            if (quoteNumber) quoteNumber.textContent = data.quoteNumber || '';
+            
+            const quoteDate = document.getElementById('quoteDate');
+            if (quoteDate) quoteDate.textContent = data.quoteDate || '';
+            
+            const companyName = document.getElementById('companyName');
+            if (companyName) companyName.textContent = data.companyName || '';
+            
+            const companyAddress = document.getElementById('companyAddress');
+            if (companyAddress) companyAddress.textContent = data.companyAddress || '';
+            
+            const taxId = document.getElementById('taxId');
+            if (taxId) taxId.textContent = data.taxId || '';
+            
+            const projectName = document.getElementById('projectName');
+            if (projectName) projectName.textContent = data.projectName || '';
+            
+            const timeline = document.getElementById('timeline');
+            if (timeline) timeline.textContent = data.timeline || '';
+            
+            const paymentTerms = document.getElementById('paymentTerms');
+            if (paymentTerms) paymentTerms.textContent = data.paymentTerms || '';
+            
+            const customerSignature = document.getElementById('customerSignature');
+            if (customerSignature) customerSignature.textContent = data.customerSignature || '';
+            
+            const customerDate = document.getElementById('customerDate');
+            if (customerDate) customerDate.textContent = data.customerDate || '';
+            
+            const vendorSignature = document.getElementById('vendorSignature');
+            if (vendorSignature) vendorSignature.textContent = data.vendorSignature || '';
+            
+            const vendorDate = document.getElementById('vendorDate');
+            if (vendorDate) vendorDate.textContent = data.vendorDate || '';
 
-            // Load items
+            // Load items with null checks
             const tbody = document.getElementById('itemsBody');
+            if (!tbody) {
+                console.warn('itemsBody not found');
+                return;
+            }
+            
             tbody.innerHTML = '';
 
             if (data.items && data.items.length > 0) {
@@ -1123,7 +1763,7 @@
                             <div class="main-description">
                                 <div class="editable" contenteditable="true">${item.mainDescription || ''}</div>
                             </div>
-                            ${item.subDescriptions.map(sub => `
+                            ${(item.subDescriptions || []).map(sub => `
                                 <div class="sub-description">
                                     <div class="editable" contenteditable="true">${sub}</div>
                                     <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
@@ -1256,7 +1896,7 @@
         // Save as PDF function - Real PDF generation
         async function saveAsPDF() {
             // Auto-save to history before generating PDF
-            saveToHistory();
+            await saveToHistory();
             
             try {
                 // Load html2pdf library if not already loaded
@@ -1430,9 +2070,9 @@
         }
         
         // Download as HTML
-        function downloadAsHTML() {
+        async function downloadAsHTML() {
             // Auto-save to history before downloading
-            saveToHistory();
+            await saveToHistory();
             
             const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .back-to-home');
             buttons.forEach(btn => btn.style.display = 'none');
@@ -1482,7 +2122,7 @@
                 z-index: 1000;
                 max-width: 350px;
                 animation: slideIn 0.3s ease;
-                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : '#3498db'};
+                background: ${type === 'success' ? '#27ae60' : type === 'error' ? '#e74c3c' : type === 'info' ? '#3498db' : '#f39c12'};
                 box-shadow: 0 4px 12px rgba(0,0,0,0.3);
             `;
             messageDiv.textContent = message;
@@ -1509,7 +2149,9 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
-            loadHistory();
+            
+            // Auto-initialize Firebase and show login page
+            initializeFirebase();
             
             // Set default date to today
             const today = new Date();
@@ -1520,4 +2162,4 @@
         });
     </script>
 </body>
-</html>
+</html> 
