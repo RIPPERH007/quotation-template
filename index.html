@@ -916,8 +916,8 @@
 
                 <div class="quote-info">
                     <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true" id="quoteNumber">QT-20250516-001</div></div>
-                    <div><strong>วันที่:</strong> <div class="editable" contenteditable="true" id="quoteDate">16/05/2025</div></div>
-                    <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true">31/05/2025</div></div>
+                    <div><strong>วันที่:</strong> <div class="editable" contenteditable="true" id="quoteDate" onblur="updateExpiryDate()">16/05/2025</div></div>
+                    <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true" id="expiryDate">31/05/2025</div></div>
                 </div>
             </div>
             
@@ -1656,6 +1656,8 @@
             
             const vendorDate = document.getElementById('vendorDate');
             if (vendorDate) vendorDate.textContent = 'วันที่ / Date: ................................';
+            const expiryDate = document.getElementById('expiryDate');
+            if (expiryDate) expiryDate.textContent = '';
             
             // Clear items table - with null check
             const tbody = document.getElementById('itemsBody');
@@ -1683,6 +1685,45 @@
             
             itemCounter = 1;
             calculateTotal();
+            
+            // อัพเดทวันหมดอายุหลังจาก clear form
+            updateExpiryDate();
+        }
+
+        // ===== DATE CALCULATION FUNCTIONS =====
+        
+        function updateExpiryDate() {
+            const quoteDateEl = document.getElementById('quoteDate');
+            const expiryDateEl = document.getElementById('expiryDate');
+            
+            if (!quoteDateEl || !expiryDateEl) return;
+            
+            const quoteDateText = quoteDateEl.textContent.trim();
+            
+            try {
+                // แปลงวันที่จากรูปแบบ DD/MM/YYYY
+                const dateParts = quoteDateText.split('/');
+                if (dateParts.length === 3) {
+                    const day = parseInt(dateParts[0]);
+                    const month = parseInt(dateParts[1]) - 1; // JavaScript month เริ่มจาก 0
+                    const year = parseInt(dateParts[2]);
+                    
+                    const quoteDate = new Date(year, month, day);
+                    
+                    // เพิ่ม 15 วัน
+                    const expiryDate = new Date(quoteDate);
+                    expiryDate.setDate(expiryDate.getDate() + 30);
+                    
+                    // แปลงกลับเป็น DD/MM/YYYY
+                    const expiryDay = String(expiryDate.getDate()).padStart(2, '0');
+                    const expiryMonth = String(expiryDate.getMonth() + 1).padStart(2, '0');
+                    const expiryYear = expiryDate.getFullYear();
+                    
+                    expiryDateEl.textContent = `${expiryDay}/${expiryMonth}/${expiryYear}`;
+                }
+            } catch (error) {
+                console.error('Error calculating expiry date:', error);
+            }
         }
 
         function generateNewQuoteNumber() {
@@ -1696,7 +1737,18 @@
             const nextNumber = String(Math.floor(Math.random() * 999) + 1).padStart(3, '0');
             
             const newQuoteNumber = `${todayPrefix}-${nextNumber}`;
-            document.getElementById('quoteNumber').textContent = newQuoteNumber;
+            const quoteNumberEl = document.getElementById('quoteNumber');
+            if (quoteNumberEl) {
+                quoteNumberEl.textContent = newQuoteNumber;
+            }
+            
+            // อัพเดทวันที่เป็นวันนี้และคำนวณวันหมดอายุ
+            const quoteDateEl = document.getElementById('quoteDate');
+            if (quoteDateEl) {
+                const todayFormatted = `${day}/${month}/${year}`;
+                quoteDateEl.textContent = todayFormatted;
+                updateExpiryDate();
+            }
         }
 
         function gatherQuotationData() {
@@ -1704,6 +1756,7 @@
             const data = {
                 quoteNumber: document.getElementById('quoteNumber')?.textContent || '',
                 quoteDate: document.getElementById('quoteDate')?.textContent || '',
+                expiryDate: document.getElementById('expiryDate')?.textContent || '',
                 companyName: document.getElementById('companyName')?.textContent || '',
                 companyAddress: document.getElementById('companyAddress')?.textContent || '',
                 taxId: document.getElementById('taxId')?.textContent || '',
@@ -1754,6 +1807,9 @@
             
             const quoteDate = document.getElementById('quoteDate');
             if (quoteDate) quoteDate.textContent = data.quoteDate || '';
+            
+            const expiryDate = document.getElementById('expiryDate');
+            if (expiryDate) expiryDate.textContent = data.expiryDate || '';
             
             const companyName = document.getElementById('companyName');
             if (companyName) companyName.textContent = data.companyName || '';
