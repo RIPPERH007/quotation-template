@@ -1033,7 +1033,7 @@
             // *** ต้องแทนที่ด้วย Firebase Config จริงจาก Firebase Console ***
             // วิธีหา Config: Firebase Console > Project Settings > General > Your apps > Config
             
-             const firebaseConfig = {
+            const firebaseConfig = {
                 apiKey: "AIzaSyBbuIekW1A-z-7xD-HwQ4Hintr92YkHeRo",
                 authDomain: "templat-po.firebaseapp.com",
                 projectId: "templat-po",
@@ -1069,7 +1069,14 @@
                     currentUser = user;
                     updateUserInfo();
                     if (user) {
+                        console.log('User logged in:', user.email);
                         showLandingPage();
+                        // โหลดข้อมูลใหม่เมื่อ login สำเร็จ
+                        setTimeout(() => {
+                            loadHistory();
+                        }, 1000);
+                    } else {
+                        console.log('User logged out');
                     }
                 });
 
@@ -1381,25 +1388,58 @@
 
                 if (useFirebase && isFirebaseInitialized && currentUser) {
                     try {
-                        // โหลดจาก Firebase
+                        console.log('Loading from Firebase for user:', currentUser.uid);
+                        
+                        // โหลดจาก Firebase แบบไม่ใช้ orderBy ก่อน (เพื่อหลีกเลี่ยง missing index)
                         const snapshot = await db.collection('quotations')
                             .where('userId', '==', currentUser.uid)
-                            .orderBy('savedAt', 'desc')
                             .get();
                         
-                        history = snapshot.docs.map(doc => doc.data());
+                        history = snapshot.docs.map(doc => ({
+                            ...doc.data(),
+                            id: doc.id  // ใช้ document ID จาก Firebase
+                        }));
                         
-                        // Sync กับ localStorage
+                        // เรียงลำดับใน JavaScript แทน
+                        history.sort((a, b) => new Date(b.savedAt) - new Date(a.savedAt));
+                        
+                        console.log('Loaded from Firebase:', history.length, 'items');
+                        
+                        // Sync กับ localStorage (เขียนทับข้อมูลใน localStorage)
                         localStorage.setItem('quotationHistory', JSON.stringify(history));
+                        
+                        if (history.length === 0) {
+                            // ถ้าไม่มีข้อมูลใน Firebase ลองโหลดจาก localStorage
+                            const localHistory = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                            if (localHistory.length > 0) {
+                                console.log('Found local data, syncing to Firebase...');
+                                // Sync ข้อมูลจาก localStorage ไป Firebase
+                                for (const item of localHistory) {
+                                    try {
+                                        await db.collection('quotations').doc(item.id).set({
+                                            ...item,
+                                            userId: currentUser.uid
+                                        });
+                                    } catch (syncError) {
+                                        console.warn('Sync to Firebase failed for item:', item.id, syncError);
+                                    }
+                                }
+                                history = localHistory;
+                            }
+                        }
                         
                     } catch (firebaseError) {
                         console.warn('Firebase load failed, using localStorage:', firebaseError);
                         // ถ้า Firebase ล้มเหลว ใช้ localStorage
                         history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                        
+                        // แสดงข้อความแจ้งเตือน
+                        showMessage('⚠️ โหลดจาก Firebase ล้มเหลว ใช้ข้อมูลในเครื่อง', 'warning');
                     }
                 } else {
                     // โหลดจาก localStorage เมื่อไม่ได้ login
                     history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+                    console.log('Loaded from localStorage:', history.length, 'items');
                 }
                 
                 historyCount.textContent = `(${history.length} รายการ)`;
@@ -2162,4 +2202,4 @@
         });
     </script>
 </body>
-</html> 
+</html>
