@@ -20,6 +20,146 @@
             font-size: 12px;
         }
         
+        /* Landing Page Styles */
+        .landing-page {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+            display: block;
+        }
+        
+        .landing-header {
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .landing-title {
+            font-size: 36px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .landing-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .landing-content {
+            padding: 40px;
+        }
+        
+        .action-cards {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .action-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        
+        .action-card:hover {
+            border-color: #3498db;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.2);
+        }
+        
+        .action-card-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+        
+        .action-card-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        
+        .action-card-desc {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+        
+        .history-section {
+            margin-top: 40px;
+        }
+        
+        .history-title {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .history-list {
+            display: grid;
+            gap: 15px;
+        }
+        
+        .history-item {
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 8px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            border-color: #3498db;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.1);
+        }
+        
+        .history-info {
+            flex: 1;
+        }
+        
+        .history-project {
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+        
+        .history-details {
+            color: #7f8c8d;
+            font-size: 12px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .history-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .no-history {
+            text-align: center;
+            color: #7f8c8d;
+            padding: 40px;
+            font-style: italic;
+        }
+        
+        /* Quotation Page Styles */
         .quotation-container {
             max-width: 800px;
             margin: 0 auto;
@@ -27,6 +167,7 @@
             box-shadow: 0 0 15px rgba(0,0,0,0.1);
             border-radius: 8px;
             overflow: hidden;
+            display: none;
         }
         
         .header-section {
@@ -335,6 +476,15 @@
             background: #27ae60;
         }
         
+        .btn-secondary {
+            background: #6c757d;
+        }
+        
+        .btn-small {
+            padding: 6px 12px;
+            font-size: 11px;
+        }
+        
         .remove-btn {
             background: #e74c3c;
             color: white;
@@ -349,7 +499,22 @@
             background: #c0392b;
         }
 
+        .back-to-home {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
         
+        .back-to-home:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
         
         @media print {
             body {
@@ -369,7 +534,7 @@
             }
             
             .btn, .remove-btn, .button-container, 
-            .remove-desc-btn, .add-desc-btn {
+            .remove-desc-btn, .add-desc-btn, .back-to-home {
                 display: none !important;
                 visibility: hidden !important;
             }
@@ -466,6 +631,11 @@
                 font-size: 11px;
             }
             
+            .action-cards {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
             .content {
                 padding: 10px;
             }
@@ -502,15 +672,50 @@
     </style>
 </head>
 <body>
-    <div class="quotation-container">
+    <!-- Landing Page -->
+    <div class="landing-page" id="landingPage">
+        <div class="landing-header">
+            <div class="landing-title">📋 ระบบใบเสนอราคา</div>
+            <div class="landing-subtitle">Quotation Management System</div>
+        </div>
+        
+        <div class="landing-content">
+            <div class="action-cards">
+                <div class="action-card" onclick="createNewQuotation()">
+                    <div class="action-card-icon">📝</div>
+                    <div class="action-card-title">สร้างใบเสนอราคาใหม่</div>
+                    <div class="action-card-desc">เริ่มต้นสร้างใบเสนอราคาใหม่สำหรับโครงการของคุณ</div>
+                </div>
+                
+                <div class="action-card" onclick="toggleHistorySection()">
+                    <div class="action-card-icon">📂</div>
+                    <div class="action-card-title">ดูประวัติใบเสนอราคา</div>
+                    <div class="action-card-desc">เรียกดูและแก้ไขใบเสนอราคาที่บันทึกไว้แล้ว</div>
+                </div>
+            </div>
+            
+            <div class="history-section" id="historySection" style="display: none;">
+                <div class="history-title">
+                    📚 ประวัติใบเสนอราคา
+                    <span id="historyCount" style="font-size: 14px; color: #7f8c8d;">(0 รายการ)</span>
+                </div>
+                <div class="history-list" id="historyList">
+                    <div class="no-history">ยังไม่มีประวัติใบเสนอราคาที่บันทึกไว้</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quotation Form -->
+    <div class="quotation-container" id="quotationContainer">
+        <button class="back-to-home" onclick="backToHome()">← กลับสู่หน้าหลัก</button>
+        
         <div class="header-section">
             <div class="thank-you">ขอขอบคุณที่ใช้บริการของเรา / Thank you for your business</div>
             <div class="quotation-title">QUOTATION</div>
         </div>
         
         <div class="content">
-
-
             <div class="vendor-customer-section">
                 <div class="vendor-info-section">
                     <div class="vendor-info">
@@ -523,11 +728,11 @@
                 </div>
                 <div style="flex: 1;"></div>
 
-            <div class="quote-info">
-                <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true">QT-20250516-001</div></div>
-                <div><strong>วันที่:</strong> <div class="editable" contenteditable="true">16/05/2025</div></div>
-                <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true">31/05/2025</div></div>
-            </div>
+                <div class="quote-info">
+                    <div><strong>เลขที่:</strong> <div class="editable" contenteditable="true" id="quoteNumber">QT-20250516-001</div></div>
+                    <div><strong>วันที่:</strong> <div class="editable" contenteditable="true" id="quoteDate">16/05/2025</div></div>
+                    <div><strong>มีผลถึง:</strong> <div class="editable" contenteditable="true">31/05/2025</div></div>
+                </div>
             </div>
             
             <div class="customer-project-section">
@@ -535,16 +740,16 @@
                     <div class="section-title">ข้อมูลลูกค้า / Customer Information</div>
                     <div class="info-row">
                         <span class="info-label">ชื่อบริษัท / Company:</span>
-                        <div class="editable" contenteditable="true">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div>
+                        <div class="editable" contenteditable="true" id="companyName">บริษัท ก๊อท อิท โซลูชันส์ จำกัด</div>
                     </div>
                     <div class="info-row">
                         <span class="info-label">ที่อยู่ / Address:</span>
-                        <div class="editable" contenteditable="true">225/708 หมู่ที่ 11 ตำบลบ้านแหวน
+                        <div class="editable" contenteditable="true" id="companyAddress">225/708 หมู่ที่ 11 ตำบลบ้านแหวน
 อำเภอหางดง จังหวัดเชียงใหม่ 50230</div>
                     </div>
                     <div class="info-row">
                         <span class="info-label">เลขประจำตัวผู้เสียภาษี / Tax ID:</span>
-                        <div class="editable" contenteditable="true">0505565016016</div>
+                        <div class="editable" contenteditable="true" id="taxId">0505565016016</div>
                     </div>
                 </div>
                 
@@ -552,15 +757,14 @@
                     <div class="section-title">รายละเอียดโครงการ / Project Details</div>
                     <div class="info-row">
                         <span class="info-label">ชื่อโครงการ / Project:</span>
-                        <div class="editable" contenteditable="true">LockBox Kiosk</div>
+                        <div class="editable" contenteditable="true" id="projectName">LockBox Kiosk</div>
                     </div>
                     <div class="info-row">
                         <span class="info-label">ระยะเวลาดำเนินการ / Timeline:</span>
-                        <div class="editable" contenteditable="true">15 วัน</div>
+                        <div class="editable" contenteditable="true" id="timeline">15 วัน</div>
                     </div>
                 </div>
             </div>
-            
             
             <table class="items-table" id="itemsTable">
                 <thead>
@@ -605,11 +809,12 @@
                 <button class="btn btn-primary" onclick="addRow()">➕ เพิ่มรายการ</button>
                 <button class="btn btn-danger" onclick="saveAsPDF()">📄 บันทึก PDF</button>
                 <button class="btn btn-success" onclick="downloadAsHTML()">💾 ดาวน์โหลด HTML</button>
+                <button class="btn btn-secondary" onclick="saveToHistory()">💾 บันทึกประวัติ</button>
             </div>
             
             <div class="payment-terms">
                 <div class="payment-terms-title">เงื่อนไขการชำระเงิน / Payment Terms</div>
-                <div class="editable" contenteditable="true">เงื่อนไขการชำระเงินสำหรับระบบ Api Leo แบ่งเป็น 2 ช่วงเวลา คือ
+                <div class="editable" contenteditable="true" id="paymentTerms">เงื่อนไขการชำระเงินสำหรับระบบ Api Leo แบ่งเป็น 2 ช่วงเวลา คือ
 1) หลังจากยืนยันการพัฒนา 50% (9,000 บาท)
 2) หลังจากเริ่มใช้งาน 50% (9,000 บาท)</div>
             </div>
@@ -617,14 +822,14 @@
             <div class="signature-section">
                 <div class="signature-box">
                     <div style="text-align: center;">................................................................</div>
-                    <div class="editable" contenteditable="true" style="text-align: center; margin-top: 8px;">(บริษัท ก๊อท อิท โซลูชันส์ จำกัด)</div>
-                    <div class="editable" contenteditable="true" style="text-align: center;">วันที่ / Date: ................................</div>
+                    <div class="editable" contenteditable="true" style="text-align: center; margin-top: 8px;" id="customerSignature">(บริษัท ก๊อท อิท โซลูชันส์ จำกัด)</div>
+                    <div class="editable" contenteditable="true" style="text-align: center;" id="customerDate">วันที่ / Date: ................................</div>
                 </div>
                 
                 <div class="signature-box">
                     <div style="text-align: center;">..............................................................</div>
-                    <div class="editable" contenteditable="true" style="text-align: center; margin-top: 8px;">(ผู้เสนอราคา / Vendor)</div>
-                    <div class="editable" contenteditable="true" style="text-align: center;">วันที่ / Date: ................................</div>
+                    <div class="editable" contenteditable="true" style="text-align: center; margin-top: 8px;" id="vendorSignature">(ผู้เสนอราคา / Vendor)</div>
+                    <div class="editable" contenteditable="true" style="text-align: center;" id="vendorDate">วันที่ / Date: ................................</div>
                 </div>
             </div>
         </div>
@@ -632,6 +837,334 @@
 
     <script>
         let itemCounter = 1;
+        let currentEditId = null;
+
+        // ===== LANDING PAGE FUNCTIONS =====
+        
+        function createNewQuotation() {
+            currentEditId = null;
+            clearForm();
+            generateNewQuoteNumber();
+            showQuotationForm();
+        }
+
+        function showQuotationForm() {
+            document.getElementById('landingPage').style.display = 'none';
+            document.getElementById('quotationContainer').style.display = 'block';
+        }
+
+        function backToHome() {
+            document.getElementById('quotationContainer').style.display = 'none';
+            document.getElementById('landingPage').style.display = 'block';
+            document.getElementById('historySection').style.display = 'none';
+            loadHistory();
+        }
+
+        function toggleHistorySection() {
+            const historySection = document.getElementById('historySection');
+            if (historySection.style.display === 'none') {
+                historySection.style.display = 'block';
+                loadHistory();
+            } else {
+                historySection.style.display = 'none';
+            }
+        }
+
+        function clearForm() {
+            // Reset quote info
+            document.getElementById('quoteNumber').textContent = '';
+            document.getElementById('quoteDate').textContent = new Date().toLocaleDateString('th-TH');
+            
+            // Reset customer info
+            document.getElementById('companyName').textContent = '';
+            document.getElementById('companyAddress').textContent = '';
+            document.getElementById('taxId').textContent = '';
+            
+            // Reset project info
+            document.getElementById('projectName').textContent = '';
+            document.getElementById('timeline').textContent = '';
+            
+            // Reset payment terms
+            document.getElementById('paymentTerms').textContent = '';
+            
+            // Reset signatures
+            document.getElementById('customerSignature').textContent = '';
+            document.getElementById('customerDate').textContent = 'วันที่ / Date: ................................';
+            document.getElementById('vendorSignature').textContent = '(ผู้เสนอราคา / Vendor)';
+            document.getElementById('vendorDate').textContent = 'วันที่ / Date: ................................';
+            
+            // Clear items table
+            const tbody = document.getElementById('itemsBody');
+            tbody.innerHTML = `
+                <tr>
+                    <td>1</td>
+                    <td class="description-cell">
+                        <div class="main-description">
+                            <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+                        </div>
+                        <div class="sub-description">
+                            <div class="editable" contenteditable="true">รายละเอียดย่อย 1</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
+                    </td>
+                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
+                    <td class="amount-cell">0.00</td>
+                    <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                </tr>
+            `;
+            
+            itemCounter = 1;
+            calculateTotal();
+        }
+
+        function generateNewQuoteNumber() {
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+            
+            // Get existing quotes from today to generate sequential number
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const todayPrefix = `QT-${year}${month}${day}`;
+            const todayQuotes = history.filter(item => item.quoteNumber.startsWith(todayPrefix));
+            const nextNumber = String(todayQuotes.length + 1).padStart(3, '0');
+            
+            const newQuoteNumber = `${todayPrefix}-${nextNumber}`;
+            document.getElementById('quoteNumber').textContent = newQuoteNumber;
+        }
+
+        // ===== HISTORY FUNCTIONS =====
+        
+        function saveToHistory() {
+            const quotationData = gatherQuotationData();
+            
+            if (!quotationData.projectName.trim()) {
+                showMessage('⚠️ กรุณากรอกชื่อโครงการก่อนบันทึก', 'error');
+                return;
+            }
+
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const timestamp = new Date().toISOString();
+            
+            const historyItem = {
+                id: currentEditId || timestamp,
+                ...quotationData,
+                savedAt: timestamp,
+                lastModified: timestamp
+            };
+
+            if (currentEditId) {
+                // Update existing item
+                const index = history.findIndex(item => item.id === currentEditId);
+                if (index !== -1) {
+                    history[index] = historyItem;
+                    showMessage('✅ อัพเดทประวัติสำเร็จ!', 'success');
+                }
+            } else {
+                // Add new item
+                history.unshift(historyItem);
+                currentEditId = historyItem.id;
+                showMessage('✅ บันทึกประวัติสำเร็จ!', 'success');
+            }
+
+            localStorage.setItem('quotationHistory', JSON.stringify(history));
+            loadHistory();
+        }
+
+        function gatherQuotationData() {
+            // Gather all form data
+            const data = {
+                quoteNumber: document.getElementById('quoteNumber').textContent,
+                quoteDate: document.getElementById('quoteDate').textContent,
+                companyName: document.getElementById('companyName').textContent,
+                companyAddress: document.getElementById('companyAddress').textContent,
+                taxId: document.getElementById('taxId').textContent,
+                projectName: document.getElementById('projectName').textContent,
+                timeline: document.getElementById('timeline').textContent,
+                paymentTerms: document.getElementById('paymentTerms').textContent,
+                customerSignature: document.getElementById('customerSignature').textContent,
+                customerDate: document.getElementById('customerDate').textContent,
+                vendorSignature: document.getElementById('vendorSignature').textContent,
+                vendorDate: document.getElementById('vendorDate').textContent,
+                totalAmount: document.getElementById('totalAmount').textContent,
+                items: []
+            };
+
+            // Gather items data
+            const rows = document.querySelectorAll('#itemsBody tr');
+            rows.forEach(row => {
+                const cells = row.cells;
+                const mainDesc = cells[1].querySelector('.main-description .editable').textContent;
+                const subDescs = Array.from(cells[1].querySelectorAll('.sub-description .editable')).map(el => el.textContent);
+                const qty = cells[2].querySelector('.editable').textContent;
+                const unitPrice = cells[3].querySelector('.editable').textContent;
+                const amount = cells[4].textContent;
+
+                data.items.push({
+                    mainDescription: mainDesc,
+                    subDescriptions: subDescs,
+                    quantity: qty,
+                    unitPrice: unitPrice,
+                    amount: amount
+                });
+            });
+
+            return data;
+        }
+
+        function loadHistory() {
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const historyList = document.getElementById('historyList');
+            const historyCount = document.getElementById('historyCount');
+            
+            historyCount.textContent = `(${history.length} รายการ)`;
+
+            if (history.length === 0) {
+                historyList.innerHTML = '<div class="no-history">ยังไม่มีประวัติใบเสนอราคาที่บันทึกไว้</div>';
+                return;
+            }
+
+            historyList.innerHTML = history.map(item => `
+                <div class="history-item">
+                    <div class="history-info">
+                        <div class="history-project">${item.projectName || 'ไม่มีชื่อโครงการ'}</div>
+                        <div class="history-details">
+                            <span>📋 ${item.quoteNumber}</span>
+                            <span>🏢 ${item.companyName || 'ไม่ระบุบริษัท'}</span>
+                            <span>💰 ${item.totalAmount} บาท</span>
+                            <span>📅 ${new Date(item.savedAt).toLocaleDateString('th-TH', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric',
+                                hour: '2-digit',
+                                minute: '2-digit'
+                            })}</span>
+                        </div>
+                    </div>
+                    <div class="history-actions">
+                        <button class="btn btn-primary btn-small" onclick="editQuotation('${item.id}')">✏️ แก้ไข</button>
+                        <button class="btn btn-danger btn-small" onclick="deleteHistoryItem('${item.id}')">🗑️ ลบ</button>
+                        <button class="btn btn-success btn-small" onclick="duplicateQuotation('${item.id}')">📋 คัดลอก</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function editQuotation(id) {
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const item = history.find(h => h.id === id);
+            
+            if (!item) {
+                showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
+                return;
+            }
+
+            currentEditId = id;
+            loadQuotationData(item);
+            showQuotationForm();
+        }
+
+        function duplicateQuotation(id) {
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const item = history.find(h => h.id === id);
+            
+            if (!item) {
+                showMessage('❌ ไม่พบข้อมูลใบเสนอราคา', 'error');
+                return;
+            }
+
+            currentEditId = null;
+            loadQuotationData(item);
+            generateNewQuoteNumber(); // Generate new quote number for duplicate
+            showQuotationForm();
+            showMessage('📋 คัดลอกใบเสนอราคาสำเร็จ! อย่าลืมบันทึกใหม่', 'success');
+        }
+
+        function deleteHistoryItem(id) {
+            if (!confirm('คุณแน่ใจหรือไม่ที่จะลบใบเสนอราคานี้?')) {
+                return;
+            }
+
+            const history = JSON.parse(localStorage.getItem('quotationHistory') || '[]');
+            const filteredHistory = history.filter(item => item.id !== id);
+            
+            localStorage.setItem('quotationHistory', JSON.stringify(filteredHistory));
+            loadHistory();
+            showMessage('🗑️ ลบใบเสนอราคาสำเร็จ!', 'success');
+        }
+
+        function loadQuotationData(data) {
+            // Load basic info
+            document.getElementById('quoteNumber').textContent = data.quoteNumber || '';
+            document.getElementById('quoteDate').textContent = data.quoteDate || '';
+            document.getElementById('companyName').textContent = data.companyName || '';
+            document.getElementById('companyAddress').textContent = data.companyAddress || '';
+            document.getElementById('taxId').textContent = data.taxId || '';
+            document.getElementById('projectName').textContent = data.projectName || '';
+            document.getElementById('timeline').textContent = data.timeline || '';
+            document.getElementById('paymentTerms').textContent = data.paymentTerms || '';
+            document.getElementById('customerSignature').textContent = data.customerSignature || '';
+            document.getElementById('customerDate').textContent = data.customerDate || '';
+            document.getElementById('vendorSignature').textContent = data.vendorSignature || '';
+            document.getElementById('vendorDate').textContent = data.vendorDate || '';
+
+            // Load items
+            const tbody = document.getElementById('itemsBody');
+            tbody.innerHTML = '';
+
+            if (data.items && data.items.length > 0) {
+                data.items.forEach((item, index) => {
+                    const row = tbody.insertRow();
+                    row.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td class="description-cell">
+                            <div class="main-description">
+                                <div class="editable" contenteditable="true">${item.mainDescription || ''}</div>
+                            </div>
+                            ${item.subDescriptions.map(sub => `
+                                <div class="sub-description">
+                                    <div class="editable" contenteditable="true">${sub}</div>
+                                    <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                                </div>
+                            `).join('')}
+                            <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
+                        </td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">${item.quantity || ''}</div></td>
+                        <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">${item.unitPrice || ''}</div></td>
+                        <td class="amount-cell">${item.amount || ''}</td>
+                        <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                    `;
+                });
+                itemCounter = data.items.length;
+            } else {
+                // Add default empty row
+                const row = tbody.insertRow();
+                row.innerHTML = `
+                    <td>1</td>
+                    <td class="description-cell">
+                        <div class="main-description">
+                            <div class="editable" contenteditable="true">รายละเอียดงาน</div>
+                        </div>
+                        <div class="sub-description">
+                            <div class="editable" contenteditable="true">รายละเอียดย่อย 1</div>
+                            <button class="remove-desc-btn" onclick="removeDescItem(this)">×</button>
+                        </div>
+                        <button class="add-desc-btn" onclick="addDescItem(this)">+ เพิ่มรายละเอียด</button>
+                    </td>
+                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">1</div></td>
+                    <td><div class="editable" contenteditable="true" onkeyup="calculateRow(this)">0.00</div></td>
+                    <td class="amount-cell">0.00</td>
+                    <td><button class="remove-btn" onclick="removeRow(this)">ลบ</button></td>
+                `;
+                itemCounter = 1;
+            }
+
+            calculateTotal();
+        }
+
+        // ===== QUOTATION FORM FUNCTIONS =====
 
         function addRow() {
             itemCounter++;
@@ -722,6 +1255,9 @@
 
         // Save as PDF function - Real PDF generation
         async function saveAsPDF() {
+            // Auto-save to history before generating PDF
+            saveToHistory();
+            
             try {
                 // Load html2pdf library if not already loaded
                 if (typeof html2pdf === 'undefined') {
@@ -736,18 +1272,12 @@
                 }
                 
                 // Hide all interactive elements
-                const interactiveElements = document.querySelectorAll('.btn, .remove-btn,  .button-container, .remove-desc-btn, .add-desc-btn');
+                const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .back-to-home');
                 const actionColumns = document.querySelectorAll('.items-table th:last-child, .items-table td:last-child');
                 const allElementsToHide = [...interactiveElements, ...actionColumns];
                 const originalStates = [];
                 
                 allElementsToHide.forEach((element, index) => {
-                    originalStates[index] = element.style.display;
-                    element.style.display = 'none';
-                });
-
-                
-                interactiveElements.forEach((element, index) => {
                     originalStates[index] = element.style.display;
                     element.style.display = 'none';
                 });
@@ -802,8 +1332,8 @@
                 });
                 
                 // Generate filename based on project name
-                const projectName = document.querySelector('.project-info .editable').textContent || 'Project';
-                const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+                const projectName = document.getElementById('projectName').textContent || 'Project';
+                const quoteNumber = document.getElementById('quoteNumber').textContent || 'QT-001';
                 const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
                 const filename = `${projectName.replace(/[^a-zA-Z0-9ก-ฮ]/g, '-')}-${quoteNumber.replace(/[^a-zA-Z0-9]/g, '-')}-${today}.pdf`;
                 
@@ -823,7 +1353,6 @@
                         scrollX: 0,
                         scrollY: 0,
                         windowHeight: 1600
-                        
                     },
                     jsPDF: { 
                         unit: 'mm', 
@@ -845,7 +1374,7 @@
                 showMessage('✅ บันทึก PDF สำเร็จ!', 'success');
                 
                 // Restore all states
-                interactiveElements.forEach((element, index) => {
+                allElementsToHide.forEach((element, index) => {
                     element.style.display = originalStates[index];
                 });
                 
@@ -878,7 +1407,7 @@
                 console.error('PDF generation error:', error);
                 
                 // Restore elements in case of error
-                const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .items-table th:last-child, .items-table td:last-child');
+                const interactiveElements = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .back-to-home, .items-table th:last-child, .items-table td:last-child');
                 interactiveElements.forEach(el => el.style.display = '');
                 
                 // Fallback to print method
@@ -886,7 +1415,7 @@
                 
                 setTimeout(() => {
                     // Hide elements for print
-                    const elementsToHide = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .items-table th:last-child, .items-table td:last-child');
+                    const elementsToHide = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .back-to-home, .items-table th:last-child, .items-table td:last-child');
                     elementsToHide.forEach(el => el.style.display = 'none');
                     
                     // Print
@@ -902,7 +1431,10 @@
         
         // Download as HTML
         function downloadAsHTML() {
-            const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn');
+            // Auto-save to history before downloading
+            saveToHistory();
+            
+            const buttons = document.querySelectorAll('.btn, .remove-btn, .button-container, .remove-desc-btn, .add-desc-btn, .back-to-home');
             buttons.forEach(btn => btn.style.display = 'none');
             
             const htmlContent = `<!DOCTYPE html>
@@ -922,7 +1454,7 @@
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             
-            const quoteNumber = document.querySelector('.quote-info .editable').textContent || 'QT-001';
+            const quoteNumber = document.getElementById('quoteNumber').textContent || 'QT-001';
             const today = new Date().toISOString().slice(0, 10).replace(/-/g, '');
             a.download = `Quotation_${quoteNumber.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.html`;
             a.href = url;
@@ -977,6 +1509,14 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', function() {
             calculateTotal();
+            loadHistory();
+            
+            // Set default date to today
+            const today = new Date();
+            const thaiDate = today.toLocaleDateString('th-TH');
+            if (document.getElementById('quoteDate').textContent.trim() === '') {
+                document.getElementById('quoteDate').textContent = thaiDate;
+            }
         });
     </script>
 </body>
